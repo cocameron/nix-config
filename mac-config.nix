@@ -25,6 +25,9 @@
     useUserPackages = true;
     backupFileExtension = "backup";
     users.colin = import ./modules/home-manager/home.nix;
+    extraSpecialArgs = {
+      machinePackages = [];
+    };
   };
 
   nix-homebrew = {

@@ -3,6 +3,7 @@
   lib,
   config,
   pkgs,
+  machinePackages ? [],
   ...
 }:
 {
@@ -27,12 +28,7 @@
       nodejs_23
       fzf
       ghostscript
-    ]
-    ++ lib.optionals stdenv.isDarwin [
-    ]
-    ++ lib.optionals stdenv.isLinux [
-      _1password-cli
-    ];
+    ] ++ machinePackages;
     sessionVariables = {
       GPG_TTY = "$(tty)";
     };

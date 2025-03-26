@@ -27,6 +27,11 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     users.colin = import ./modules/home-manager/home.nix;
+    extraSpecialArgs = {
+    	machinePackages = with pkgs; [
+	  _1password-cli
+	];
+    };
   };
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
