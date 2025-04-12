@@ -28,9 +28,9 @@
     useUserPackages = true;
     users.colin = import ./modules/home-manager/home.nix;
     extraSpecialArgs = {
-    	machinePackages = with pkgs; [
-	  _1password-cli
-	];
+      machinePackages = with pkgs; [
+        _1password-cli
+      ];
     };
   };
 

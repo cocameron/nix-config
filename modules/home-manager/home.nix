@@ -3,7 +3,7 @@
   lib,
   config,
   pkgs,
-  machinePackages ? [],
+  machinePackages ? [ ],
   ...
 }:
 {
@@ -17,24 +17,27 @@
 
   home = {
     username = "colin";
-    packages = with pkgs; [
-      devenv
-      ffmpeg
-      xh
-      graphviz
-      imagemagick
-      libxml2
-      tectonic
-      nodejs_23
-      fzf
-      ghostscript
-    ] ++ machinePackages;
+    packages =
+      with pkgs;
+      [
+        devenv
+        ffmpeg
+        xh
+        graphviz
+        imagemagick
+        libxml2
+        tectonic
+        nodejs_23
+        fzf
+        ghostscript
+      ]
+      ++ machinePackages;
     sessionVariables = {
       GPG_TTY = "$(tty)";
     };
   };
 
- programs = {
+  programs = {
     home-manager.enable = true;
     neovim.enable = true;
     git = {
