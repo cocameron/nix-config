@@ -21,6 +21,9 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware/master";
+    };
   };
 
   outputs =
@@ -59,6 +62,14 @@
             ./nixlab-config.nix
           ];
         };
+	
+	greenix = nixpkgs.lib.nixosSystem {
+	  specialArgs = { inherit inputs; };
+	  system = "x86_64-linux";
+	  modules = [
+	    ./greenix-config.nix
+	  ];
+	};
       };
     };
 }
