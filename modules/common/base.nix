@@ -29,4 +29,7 @@
   users.users.colin = {
     shell = pkgs.zsh;
   };
+
+  # Enable system-wide zsh
+  programs.zsh.enable = true;
 }

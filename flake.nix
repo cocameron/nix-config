@@ -1,6 +1,7 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-24.11-darwin";
+    unstableNixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin.url = "github:LnL7/nix-darwin/nix-darwin-24.11";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager/release-24.11";
@@ -31,6 +32,8 @@
       self,
       nix-darwin,
       nixpkgs,
+      unstableNixpkgs,
+
       ...
     }@inputs:
     {
@@ -62,14 +65,20 @@
             ./nixlab-config.nix
           ];
         };
-	
-	greenix = nixpkgs.lib.nixosSystem {
-	  specialArgs = { inherit inputs; };
-	  system = "x86_64-linux";
-	  modules = [
-	    ./greenix-config.nix
-	  ];
-	};
+
+        greenix = nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit inputs;
+            pkgs-unstable = import unstableNixpkgs {
+              system = "x86_64-linux";
+              config.allowUnfree = true;
+            };
+          };
+          system = "x86_64-linux";
+          modules = [
+            ./greenix-config.nix
+          ];
+        };
       };
     };
 }

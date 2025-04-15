@@ -12,15 +12,15 @@
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
     inputs.home-manager.nixosModules.default
-    inputs.nixos-wsl.nixosModules.default
-    ./modules/nix/base.nix
+    # inputs.nixos-wsl.nixosModules.default # WSL module not needed for nixlab
+    ./modules/common/base.nix
+    ./modules/common/nixos-base.nix # Import common NixOS settings
   ];
 
   config = {
-
-    #Provide a default hostname
-    networking.hostName = lib.mkDefault "nixlab";
-    networking.useDHCP = lib.mkDefault true;
+    # Hostname and DHCP are handled by nixos-base.nix (using mkDefault)
+    # Override hostname here if needed:
+    networking.hostName = "nixlab"; # Set specific hostname for nixlab
 
     # Enable QEMU Guest for Proxmox
     services.qemuGuest.enable = lib.mkDefault true;
@@ -36,24 +36,16 @@
       "root"
       "@wheel"
     ];
-        # Enable mDNS for `hostname.local` addresses
-    services.avahi.enable = true;
-    services.avahi.nssmdns = true;
-    services.avahi.publish = {
-      enable = true;
-      addresses = true;
-    };
+    # services.avahi... # Moved to common/linux-base.nix
 
-    # Some sane packages we need on every system
+    # Specific packages needed for nixlab (pinentry-curses moved to common)
     environment.systemPackages = with pkgs; [
       vim # for emergencies
       git # for pulling nix flakes
       python3 # for ansible
-      pinentry-curses
     ];
 
-    # Don't ask for passwords
-    security.sudo.wheelNeedsPassword = false;
+    # security.sudo.wheelNeedsPassword = false; # Moved to common/linux-base.nix
 
     # Enable ssh
     services.openssh = {
@@ -70,23 +62,16 @@
       fsType = "ext4";
     };
 
-    users.users.colin = {
-      isNormalUser = true;
-      extraGroups = [
-        "networkmanager"
-        "wheel"
-      ];
-      openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWxH6KYmI6UCzu3j+HhnKMhFcDT1oyMilWG76qXF8yV"
-      ];
-    };
+    # User 'colin' base defined in common/nixos-base.nix
+    # Add machine-specific settings here (e.g., additional keys if needed).
+    # users.users.colin.openssh.authorizedKeys.keys = [ ... ]; # Common key moved to nixos-base.nix
 
-    programs.zsh.enable = true;
+    # programs.zsh.enable = true; # Moved to common/linux-base.nix
 
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
-      users.colin = import ./modules/home-manager/home.nix;
+      users.colin = import ./modules/common/home-manager/home.nix;
       extraSpecialArgs = {
         machinePackages = with pkgs; [
           _1password-cli

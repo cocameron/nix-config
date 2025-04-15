@@ -7,7 +7,7 @@
   imports = [
     inputs.home-manager.darwinModules.home-manager
     inputs.nix-homebrew.darwinModules.nix-homebrew
-    ./modules/nix/base.nix
+    ./modules/common/base.nix
   ];
   environment.systemPackages = [
     pkgs.vim
@@ -24,7 +24,7 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "backup";
-    users.colin = import ./modules/home-manager/home.nix;
+    users.colin = import ./modules/common/home-manager/home.nix;
     extraSpecialArgs = {
       machinePackages = [ ];
     };

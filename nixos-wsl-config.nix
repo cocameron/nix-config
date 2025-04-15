@@ -8,25 +8,25 @@
   imports = [
     inputs.home-manager.nixosModules.default
     inputs.nixos-wsl.nixosModules.default
-    ./modules/nix/base.nix
+    ./modules/common/base.nix
+    ./modules/common/nixos-base.nix # Import common NixOS settings
   ];
 
-  environment.systemPackages = [
-    pkgs.pinentry-curses
-  ];
+  # WSL-specific packages (pinentry-curses moved to common)
+  # environment.systemPackages = []; # Add any WSL-specific system packages here if needed
 
   wsl = {
     enable = true;
     defaultUser = "colin";
   };
 
-  programs.zsh.enable = true;
-  security.sudo.wheelNeedsPassword = false;
+  # programs.zsh.enable = true; # Moved to common/linux-base.nix
+  # security.sudo.wheelNeedsPassword = false; # Moved to common/linux-base.nix
 
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    users.colin = import ./modules/home-manager/home.nix;
+    users.colin = import ./modules/common/home-manager/home.nix;
     extraSpecialArgs = {
       machinePackages = with pkgs; [
         _1password-cli
