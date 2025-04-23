@@ -37,10 +37,16 @@
     };
 
     sops = {
-    defaultSopsFile = "/home/colin/secrets/secrets.yaml";
-    validateSopsFiles = false;
+    # Ensure the sops file is part of the configuration derivation
+    defaultSopsFile = ./secrets.yaml; # Use the new relative path
+    validateSopsFiles = false; # Keep false for now, can set true later
     secrets = {
-      wireguard_private_key = {};
+      # Secret needed by user 'colin' for a podman container
+      wireguard_private_key = {
+        owner = config.users.users.colin.name;
+        group = config.users.users.colin.group;
+        mode = "0400"; # Owner read-only is sufficient
+      };
     };
   };
 
