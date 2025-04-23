@@ -97,54 +97,54 @@
       enable = true;
       user = "colin";
     };
-    services.caddy = {
-      enable = true;
-      globalConfig = ''
-        	  auto_https prefer_wildcard
-      '';
-      virtualHosts."*.nixlab.brucebrus.org".extraConfig = ''
-                tls {
-        	  dns cloudflare {
-        	    api_token {$CLOUDFLARE_API_TOKEN}
-        	  }
-        	  propagation_timeout 6m
-                  resolvers 1.1.1.1
-        	}
-      '';
-      virtualHosts."plex.nixlab.brucebrus.org".extraConfig = ''
-        reverse_proxy localhost:32400
-      '';
-      virtualHosts."qbittorrent.nixlab.brucebrus.org".extraConfig = ''
-        reverse_proxy localhost:8200
-      '';
-      virtualHosts."radarr.nixlab.brucebrus.org".extraConfig = ''
-        reverse_proxy localhost:7878
-      '';
-      virtualHosts."prowlarr.nixlab.brucebrus.org".extraConfig = ''
-        reverse_proxy localhost:9696
-      '';
-      virtualHosts."sonarr.nixlab.brucebrus.org".extraConfig = ''
-        reverse_proxy localhost:8989
-      '';
-      virtualHosts."ha.nixlab.brucebrus.org".extraConfig = ''
-        reverse_proxy localhost:8123
-      '';
-
-      package = pkgs-unstable.caddy.withPlugins {
-        plugins = [
-          "github.com/lucaslorentz/caddy-docker-proxy/v2@v2.9.2"
-          "github.com/caddy-dns/cloudflare@v0.1.0"
-        ];
-        hash = "sha256-OgQy6Fg0zNOUsIrL+cQ/XnJgX+TyfZyu2rjCVdafzyk=";
-      };
-    };
-
-    systemd.services.caddy = {
-      serviceConfig = {
-        EnvironmentFile = "/home/colin/code/nix-config/caddy.env";
-        TimeoutStartSec = "5m";
-      };
-    };
+    # services.caddy = {
+    #   enable = true;
+    #   globalConfig = ''
+    #     	  auto_https prefer_wildcard
+    #   '';
+    #   virtualHosts."*.nixlab.brucebrus.org".extraConfig = ''
+    #             tls {
+    #     	  dns cloudflare {
+    #     	    api_token {$CLOUDFLARE_API_TOKEN}
+    #     	  }
+    #     	  propagation_timeout 6m
+    #               resolvers 1.1.1.1
+    #     	}
+    #   '';
+    #   virtualHosts."plex.nixlab.brucebrus.org".extraConfig = ''
+    #     reverse_proxy localhost:32400
+    #   '';
+    #   virtualHosts."qbittorrent.nixlab.brucebrus.org".extraConfig = ''
+    #     reverse_proxy localhost:8200
+    #   '';
+    #   virtualHosts."radarr.nixlab.brucebrus.org".extraConfig = ''
+    #     reverse_proxy localhost:7878
+    #   '';
+    #   virtualHosts."prowlarr.nixlab.brucebrus.org".extraConfig = ''
+    #     reverse_proxy localhost:9696
+    #   '';
+    #   virtualHosts."sonarr.nixlab.brucebrus.org".extraConfig = ''
+    #     reverse_proxy localhost:8989
+    #   '';
+    #   virtualHosts."ha.nixlab.brucebrus.org".extraConfig = ''
+    #     reverse_proxy localhost:8123
+    #   '';
+    # 
+    #   package = pkgs-unstable.caddy.withPlugins {
+    #     plugins = [
+    #       "github.com/lucaslorentz/caddy-docker-proxy/v2@v2.9.2"
+    #       "github.com/caddy-dns/cloudflare@v0.1.0"
+    #     ];
+    #     hash = "sha256-OgQy6Fg0zNOUsIrL+cQ/XnJgX+TyfZyu2rjCVdafzyk=";
+    #   };
+    # };
+    # 
+    # systemd.services.caddy = {
+    #   serviceConfig = {
+    #     EnvironmentFile = "/home/colin/code/nix-config/caddy.env";
+    #     TimeoutStartSec = "5m";
+    #   };
+    # };
 
     # Enable QEMU Guest for Proxmox
     services.qemuGuest.enable = lib.mkDefault true;
