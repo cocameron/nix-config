@@ -98,6 +98,58 @@
           		pinentry-program /run/current-system/sw/bin/pinentry
           	      '';
       };
+
+      podman = {
+        enable = true;
+        containers = {
+	  gluetun = {
+	    image = "qmcgaw/gluetun";
+	    addCapabilities = ["NET_ADMIN"];
+	    devices = ["/dev/net/tun:/dev/net/tun"];
+	    volumes = [
+	      "/home/colin/.local/config/gluetun:/config"
+	    ];
+	    ports = [
+	     "8888:8888/tcp"  # Gluetun Local Network HTTP proxy                     
+	     "8388:8388/tcp"  # Gluetun Local Network Shadowsocks                     
+	     "8388:8388/udp"  # Gluetun Local Network Shadowsocks 
+	     "8200:8200" # qbit web ui
+	    ];
+	    environmentFile = ["/home/colin/code/nix-config/.env"];
+	    environment = {
+	      WIREGUARD_MTU=1320;
+	      TZ = "America/Los_Angeles";
+	      VPN_SERVICE_PROVIDER="protonvpn";
+	      VPN_TYPE="wireguard";
+	      PORT_FORWARD_ONLY="on";
+	      VPN_PORT_FORWARDING="on";
+	      VPN_PORT_FORWARDING_UP_COMMAND = "\\\"/bin/sh -c '/config/assign-ports.sh qbit {{PORTS}}'\\\"";
+	      HTTPPROXY="on";
+	      SHADOWSOCKS="on";
+	    };
+	  };
+	  qbittorrent = {
+	    image="qbittorrentofficial/qbittorrent-nox";
+	    volumes= [
+	     "/home/colin/.config/qbittorrent:/config"
+	     "/mnt/nfs/content:/data"
+	    ];
+	    extraConfig = {
+		Unit.Requires = "podman-gluetun.service";
+		Unit.After = "podman-gluetun.service";
+	    };
+	    network = lib.mkForce ["container:gluetun"];
+	    environment = {
+	      TZ = "America/Los_Angeles";
+	      QBT_LEGAL_NOTICE="confirm";
+	      QBT_VERSION="latest";
+	      QBT_WEBUI_PORT=8200;
+	      QBT_CONFIG_PATH="/config";
+	      QBT_DOWNLOADS_PATH="/downloads";
+	    };
+	  };
+        };
+      };
     };
     # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
     home.stateVersion = "24.11";
