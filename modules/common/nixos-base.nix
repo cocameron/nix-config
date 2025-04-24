@@ -27,8 +27,9 @@
   # Use nssmdns = true; for both v4/v6 resolution
   services.avahi = {
     enable = true;
-    # Enable both IPv4 and IPv6 mDNS resolution
-    nssmdns = true;
+    # Enable both IPv4 and IPv6 mDNS resolution via nss-mdns
+    nssmdns4 = true;
+    nssmdns6 = true;
     publish = {
       enable = true;
       addresses = true;
