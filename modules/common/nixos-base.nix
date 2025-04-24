@@ -45,5 +45,6 @@
       # Common SSH key for colin
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWxH6KYmI6UCzu3j+HhnKMhFcDT1oyMilWG76qXF8yV"
     ];
+    linger = true;
   };
 }

@@ -23,74 +23,96 @@
   config = {
     # Hostname and DHCP are handled by nixos-base.nix (using mkDefault)
     # Override hostname here if needed
+    environment.variables = {
+      GPG_TTY = "$(tty)";
+    };
     networking.hostName = "nixlab"; # Set specific hostname for nixlab
     networking.firewall = {
-    # Allow the HomeKit bridge port
-    allowedTCPPorts = [ 21064 ];
-    
-    # Also open UDP port 5353 for mDNS discovery that HomeKit needs
-    allowedUDPPorts = [ 5353 ];
-  };
+      # Allow the HomeKit bridge port
+      allowedTCPPorts = [ 21064 ];
+
+      # Also open UDP port 5353 for mDNS discovery that HomeKit needs
+      allowedUDPPorts = [ 5353 ];
+    };
+    programs.gnupg.agent = {
+	    enable = true;
+	    # Alternatively, you can specify a custom program:
+	    # pinentryPackage = pkgs.pinentry-qt; # or another pinentry package
+	  };
+
+	  # If you need to set a specific pinentry program instead of using flavors:
+	#  environment.etc."gnupg/gpg-agent.conf".text = ''
+	 #   pinentry-program ${pkgs.pinentry-gtk2}/bin/pinentry
+	  #;'';
     virtualisation.podman = {
       enable = true;
       defaultNetwork.settings.dns_enabled = true;
     };
 
     sops = {
-    # Ensure the sops file is part of the configuration derivation
-    defaultSopsFile = ./secrets.yaml; # Use the new relative path
-    validateSopsFiles = false; # Keep false for now, can set true later
-    secrets = {
-      # Secret needed by user 'colin' for a podman container
-      wireguard_private_key = {
-        owner = config.users.users.colin.name;
-        group = config.users.users.colin.group;
-        mode = "0400"; # Owner read-only is sufficient
+      # Ensure the sops file is part of the configuration derivation
+      defaultSopsFile = "/var/lib/sops-nix/secrets.yaml"; # Use the new relative path
+      age = {
+      	keyFile = "/var/lib/sops-nix/keys.txt";
+      };
+      validateSopsFiles = false; # Keep false for now, can set true later
+      secrets = {
+        # Secret needed by user 'colin' for a podman container
+        wireguard_private_key = {
+	  owner = "colin";
+        };
+	cloudflare_api_token = {};
+      };
+
+      templates."caddy-cloudflare-env" = {
+      content = ''
+        # Cloudflare API token for DNS challenges
+        CLOUDFLARE_API_TOKEN=${config.sops.placeholder."cloudflare_api_token"}
+      '';
       };
     };
-  };
 
     services.tailscale.enable = true;
     services.plex = {
       enable = true;
     };
-    
-    services.home-assistant = {
-	    enable = true;
 
-	    extraComponents = [
-	      # Components required to complete the onboarding
-	      "esphome"
-	      "met"
-	      "radio_browser"
-	      "spotify"
-	      "apple_tv"
-	      "google_translate"
-	      "cast"
-	      "hue"
-	      "sonos"
-	      "homekit_controller"
-	      "ecobee"
-	      "isal"
-	      "zha"
-	      "hassio"
-	      "homekit"
-	    ];
-	    config = {
-	      # Includes dependencies for a basic setup
-	      # https://www.home-assistant.io/integrations/default_config/
-	      default_config = {};
-	          	      http = {
-	        use_x_forwarded_for = true;
-		trusted_proxies = [
-		  "::1"
-		  "127.0.0.1"
-		];
-	      };
-	      zha = {
-	        usb_path = "/dev/ttyUSB0";
-	      };
-	    };
+    services.home-assistant = {
+      enable = true;
+
+      extraComponents = [
+        # Components required to complete the onboarding
+        "esphome"
+        "met"
+        "radio_browser"
+        "spotify"
+        "apple_tv"
+        "google_translate"
+        "cast"
+        "hue"
+        "sonos"
+        "homekit_controller"
+        "ecobee"
+        "isal"
+        "zha"
+        "hassio"
+        "homekit"
+      ];
+      config = {
+        # Includes dependencies for a basic setup
+        # https://www.home-assistant.io/integrations/default_config/
+        default_config = { };
+        http = {
+          use_x_forwarded_for = true;
+          trusted_proxies = [
+            "::1"
+            "127.0.0.1"
+          ];
+        };
+        zha = {
+          usb_path = "/dev/ttyUSB0";
+        };
+      };
     };
     services.radarr = {
       enable = true;
@@ -103,54 +125,54 @@
       enable = true;
       user = "colin";
     };
-    # services.caddy = {
-    #   enable = true;
-    #   globalConfig = ''
-    #     	  auto_https prefer_wildcard
-    #   '';
-    #   virtualHosts."*.nixlab.brucebrus.org".extraConfig = ''
-    #             tls {
-    #     	  dns cloudflare {
-    #     	    api_token {$CLOUDFLARE_API_TOKEN}
-    #     	  }
-    #     	  propagation_timeout 6m
-    #               resolvers 1.1.1.1
-    #     	}
-    #   '';
-    #   virtualHosts."plex.nixlab.brucebrus.org".extraConfig = ''
-    #     reverse_proxy localhost:32400
-    #   '';
-    #   virtualHosts."qbittorrent.nixlab.brucebrus.org".extraConfig = ''
-    #     reverse_proxy localhost:8200
-    #   '';
-    #   virtualHosts."radarr.nixlab.brucebrus.org".extraConfig = ''
-    #     reverse_proxy localhost:7878
-    #   '';
-    #   virtualHosts."prowlarr.nixlab.brucebrus.org".extraConfig = ''
-    #     reverse_proxy localhost:9696
-    #   '';
-    #   virtualHosts."sonarr.nixlab.brucebrus.org".extraConfig = ''
-    #     reverse_proxy localhost:8989
-    #   '';
-    #   virtualHosts."ha.nixlab.brucebrus.org".extraConfig = ''
-    #     reverse_proxy localhost:8123
-    #   '';
-    # 
-    #   package = pkgs-unstable.caddy.withPlugins {
-    #     plugins = [
-    #       "github.com/lucaslorentz/caddy-docker-proxy/v2@v2.9.2"
-    #       "github.com/caddy-dns/cloudflare@v0.1.0"
-    #     ];
-    #     hash = "sha256-OgQy6Fg0zNOUsIrL+cQ/XnJgX+TyfZyu2rjCVdafzyk=";
-    #   };
-    # };
-    # 
-    # systemd.services.caddy = {
-    #   serviceConfig = {
-    #     EnvironmentFile = "/home/colin/code/nix-config/caddy.env";
-    #     TimeoutStartSec = "5m";
-    #   };
-    # };
+    services.caddy = {
+      enable = true;
+      globalConfig = ''
+        	  auto_https prefer_wildcard
+      '';
+      virtualHosts."*.nixlab.brucebrus.org".extraConfig = ''
+                tls {
+        	  dns cloudflare {
+        	    api_token {$CLOUDFLARE_API_TOKEN}
+        	  }
+        	  propagation_timeout 6m
+                  resolvers 1.1.1.1
+        	}
+      '';
+      virtualHosts."plex.nixlab.brucebrus.org".extraConfig = ''
+        reverse_proxy localhost:32400
+      '';
+      virtualHosts."qbittorrent.nixlab.brucebrus.org".extraConfig = ''
+        reverse_proxy localhost:8200
+      '';
+      virtualHosts."radarr.nixlab.brucebrus.org".extraConfig = ''
+        reverse_proxy localhost:7878
+      '';
+      virtualHosts."prowlarr.nixlab.brucebrus.org".extraConfig = ''
+        reverse_proxy localhost:9696
+      '';
+      virtualHosts."sonarr.nixlab.brucebrus.org".extraConfig = ''
+        reverse_proxy localhost:8989
+      '';
+      virtualHosts."ha.nixlab.brucebrus.org".extraConfig = ''
+        reverse_proxy localhost:8123
+      '';
+
+      package = pkgs-unstable.caddy.withPlugins {
+        plugins = [
+          "github.com/lucaslorentz/caddy-docker-proxy/v2@v2.9.2"
+          "github.com/caddy-dns/cloudflare@v0.1.0"
+        ];
+        hash = "sha256-OgQy6Fg0zNOUsIrL+cQ/XnJgX+TyfZyu2rjCVdafzyk=";
+      };
+    };
+
+    systemd.services.caddy = {
+      serviceConfig = {
+        EnvironmentFile =  config.sops.templates."caddy-cloudflare-env".path;
+	TimeoutStartSec = "5m";
+      };
+    };
 
     # Enable QEMU Guest for Proxmox
     services.qemuGuest.enable = lib.mkDefault true;
@@ -224,12 +246,12 @@
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
-      users.colin.imports = [./modules/nixlab/home-manager/home.nix];
+      users.colin.imports = [ ./modules/nixlab/home-manager/home.nix ];
       extraSpecialArgs = {
         machinePackages = with pkgs; [
           _1password-cli
         ];
-	nixosConfig = config;
+        nixosConfig = config;
       };
     };
 

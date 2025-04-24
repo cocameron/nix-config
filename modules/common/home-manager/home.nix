@@ -90,14 +90,14 @@
     };
 
     services = {
-      gpg-agent = {
-        enable = true;
-        enableZshIntegration = true;
-        extraConfig = ''
-          		# Use the system-wide pinentry path
-          		pinentry-program /run/current-system/sw/bin/pinentry
-          	      '';
-      };
+#      gpg-agent = {
+#        enable = true;
+#        enableZshIntegration = true;
+#        extraConfig = ''
+#          		# Use the system-wide pinentry path
+#          		pinentry-program /run/current-system/sw/bin/pinentry
+#          	      '';
+#      };
     };
     # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
     home.stateVersion = "24.11";

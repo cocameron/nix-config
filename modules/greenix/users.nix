@@ -1,5 +1,4 @@
-_:
-{
+_: {
   config = {
     # security.sudo.wheelNeedsPassword = false; # Moved to common/linux-base.nix
 

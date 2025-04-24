@@ -16,6 +16,10 @@
     #  url = "github:hraban/mac-app-util";
     #  inputs.nixpkgs.url = "github:NixOS/nixpkgs?rev=a84b0a7c509bdbaafbe6fe6e947bdaa98acafb99";
     #};
+
+    quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
+    quadlet-nix.inputs.nixpkgs.follows = "nixpkgs";
+
     # Optional: Declarative tap management
     homebrew-core = {
       url = "github:homebrew/homebrew-core";
@@ -27,6 +31,11 @@
     };
     nixos-hardware = {
       url = "github:NixOS/nixos-hardware/master";
+    };
+
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -62,7 +71,14 @@
         };
 
         nixlab = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs; };
+          specialArgs = {
+            inherit inputs;
+            pkgs-unstable = import unstableNixpkgs {
+              system = "x86_64-linux";
+              config.allowUnfree = true;
+            };
+          };
+
           system = "x86_64-linux";
           modules = [
             ./nixlab-config.nix
@@ -83,5 +99,6 @@
           ];
         };
       };
+
     };
 }
