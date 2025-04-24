@@ -188,13 +188,12 @@
       "root"
       "@wheel"
     ];
-    # services.avahi... # Moved to common/linux-base.nix
+    # services.avahi... # Moved to common/nixos-base.nix
 
-    # Specific packages needed for nixlab (pinentry-curses moved to common)
-    environment.systemPackages = with pkgs; [
-      vim # for emergencies
-      git # for pulling nix flakes
-      python3 # for ansible
+    # Specific packages needed for nixlab
+    # Common packages (vim, git, python3, pinentry-curses) moved to common/nixos-base.nix
+    environment.systemPackages = [
+      # Add any nixlab-specific system packages here if needed
     ];
 
     # security.sudo.wheelNeedsPassword = false; # Moved to common/linux-base.nix
@@ -256,6 +255,7 @@
     };
 
     services.cloud-init.network.enable = true;
-    system.stateVersion = lib.mkDefault "24.05";
+    # Update state version for consistency
+    system.stateVersion = lib.mkDefault "24.11";
   };
 }

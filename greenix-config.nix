@@ -8,30 +8,25 @@
   pkgs-unstable,
   ...
 }:
-let
-  # Imports all .nix files directly within a given directory path.
-  # Assumes paths are relative to the file calling this function.
-  importModulesFromDir =
-    dirPath:
-    lib.mapAttrsToList (name: value: dirPath + "/${name}") (
-      lib.filterAttrs (n: v: lib.hasSuffix ".nix" n) (builtins.readDir dirPath)
-    );
-in
 {
-  imports =
-    [
-      # Base NixOS settings
-      ./modules/common/base.nix
-      # Common NixOS settings
-      ./modules/common/nixos-base.nix
+  imports = [
+    # Base NixOS settings
+    ./modules/common/base.nix
+    # Common NixOS settings
+    ./modules/common/nixos-base.nix
 
-      # Import all NixOS modules within the greenix directory using the helper
-    ]
-    ++ importModulesFromDir ./modules/greenix
-    ++ [
-      # Home Manager integration
-      inputs.home-manager.nixosModules.default
-    ];
+    # Greenix specific modules (explicit imports)
+    ./modules/greenix/boot.nix
+    ./modules/greenix/desktop.nix
+    ./modules/greenix/gaming.nix
+    ./modules/greenix/hardware.nix
+    ./modules/greenix/packages.nix
+    ./modules/greenix/users.nix
+    # ./modules/greenix/services.nix # Assuming this might exist or be added later
+
+    # Home Manager integration
+    inputs.home-manager.nixosModules.default
+  ];
 
   config = {
     # This value determines the NixOS release from which the default

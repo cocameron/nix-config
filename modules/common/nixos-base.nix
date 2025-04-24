@@ -16,15 +16,19 @@
   security.sudo.wheelNeedsPassword = false;
 
   # Common packages needed across Linux systems
-  environment.systemPackages = [
-    pkgs.pinentry-curses # Common pinentry for GPG/SSH agent
+  environment.systemPackages = with pkgs; [
+    pinentry-curses # Common pinentry for GPG/SSH agent
+    vim # Basic editor
+    git # Version control
+    python3 # Often needed for various tools/scripts
   ];
 
   # Enable mDNS for `hostname.local` addresses
   # Use nssmdns = true; for both v4/v6 resolution
   services.avahi = {
     enable = true;
-    nssmdns4 = true;
+    # Enable both IPv4 and IPv6 mDNS resolution
+    nssmdns = true;
     publish = {
       enable = true;
       addresses = true;

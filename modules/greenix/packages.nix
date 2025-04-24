@@ -8,15 +8,8 @@ let
 in
 {
   config = {
-    # Some sane packages we need on every system
-    # Specific packages needed for greenix (pinentry-curses moved to common)
-    environment.systemPackages =
-      with pkgs;
-      [
-        vim # for emergencies
-        git # for pulling nix flakes
-        python3 # for ansible
-      ]
-      ++ unstable; # Add unstable packages here
+    # Specific packages needed for greenix
+    # Common packages (vim, git, python3, pinentry-curses) moved to common/nixos-base.nix
+    environment.systemPackages = unstable; # Add only unstable packages here
   };
 }
