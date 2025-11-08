@@ -3,6 +3,7 @@
   lib,
   config,
   pkgs,
+  pkgs-unstable ? pkgs,
   ...
 }:
 
@@ -30,7 +31,11 @@
           nodejs_24
           fzf
           ghostscript
+<<<<<<< Updated upstream
           claude-code
+=======
+	  pkgs-unstable.claude-code
+>>>>>>> Stashed changes
         ]
         ++ config.local.machinePackages;
       sessionVariables = {
@@ -100,7 +105,7 @@
 #      };
     };
     # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-    home.stateVersion = "24.11";
+    home.stateVersion = "25.05";
   };
   options.local.machinePackages = lib.mkOption {
     default = [ ];

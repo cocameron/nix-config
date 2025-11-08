@@ -1,10 +1,20 @@
 {
   inputs = {
+<<<<<<< Updated upstream
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     unstableNixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager/master";
+=======
+    # Use nixos-25.05 channel for NixOS systems and potentially Darwin
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    unstableNixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nix-darwin.url = "github:LnL7/nix-darwin/nix-darwin-25.05";
+    # Darwin can follow the main nixpkgs input
+    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+    home-manager.url = "github:nix-community/home-manager/release-25.05";
+>>>>>>> Stashed changes
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
     nix-homebrew.inputs.nixpkgs.follows = "nixpkgs";

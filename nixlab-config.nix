@@ -9,6 +9,33 @@
   ...
 }:
 
+let
+  unpackerr = pkgs.stdenv.mkDerivation rec {
+    pname = "unpackerr";
+    version = "0.14.5";
+
+    src = pkgs.fetchurl {
+      url = "https://github.com/Unpackerr/unpackerr/releases/download/v${version}/unpackerr.amd64.linux.gz";
+      sha256 = "08spf1afi6sgg8321m3fbd0g8rxi45vfrhaf6v298cdqlwir1l3v";
+    };
+
+    dontUnpack = true;
+
+    installPhase = ''
+      mkdir -p $out/bin
+      gunzip -c $src > $out/bin/unpackerr
+      chmod +x $out/bin/unpackerr
+    '';
+
+    meta = with pkgs.lib; {
+      description = "Extracts downloads for Radarr, Sonarr, Lidarr, Readarr, and/or a watch folder";
+      homepage = "https://github.com/Unpackerr/unpackerr";
+      license = licenses.mit;
+      platforms = platforms.linux;
+    };
+  };
+in
+
 {
   disabledModules = [ "services/web-servers/caddy" ];
 
@@ -62,6 +89,9 @@
 	  owner = "colin";
         };
 	cloudflare_api_token = {};
+        slskd_pass = {
+          owner = "colin";
+        };
       };
 
       templates."caddy-cloudflare-env" = {
@@ -73,9 +103,26 @@
     };
 
     services.tailscale.enable = true;
-    services.plex = {
-      enable = true;
-    };
+
+services.plex = let 
+  plexpass = pkgs.plex.override { 
+    plexRaw = pkgs.plexRaw.overrideAttrs(old: rec { 
+      version = "1.42.2.10156-f737b826c"; # Replace with current Plexpass version
+      src = pkgs.fetchurl { 
+        url = "https://downloads.plex.tv/plex-media-server-new/${version}/debian/plexmediaserver_${version}_amd64.deb"; 
+	sha256 = "sha256-1ieh7qc1UBTorqQTKUQgKzM96EtaKZZ8HYq9ILf+X3M=";
+      }; 
+    }); 
+  }; 
+in { 
+  enable = true; 
+  package = plexpass;
+  user = "colin";
+  # Add any other configuration options here
+  # user = "plex";  # Optional: specify user
+  # group = "plex"; # Optional: specify group
+  # dataDir = "/var/lib/plex"; # Optional: specify data directory
+};
 
     services.home-assistant = {
       enable = true;
@@ -97,6 +144,7 @@
         "zha"
         "hassio"
         "homekit"
+	"wemo"
       ];
       config = {
         # Includes dependencies for a basic setup
@@ -124,6 +172,34 @@
     services.sonarr = {
       enable = true;
       user = "colin";
+    };
+    services.lidarr = {
+      enable = true;
+      user = "colin";
+      dataDir = "/mnt/nfs/content/media/music";
+      settings = {
+        update = {
+          mechanism = "builtIn";
+        };
+      };
+    };
+
+    systemd.services.unpackerr = {
+      description = "Unpackerr extracts downloads for Radarr, Sonarr, Lidarr, and Readarr";
+      after = [ "network.target" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        Type = "simple";
+        User = "colin";
+        Group = "users";
+        ExecStart = "${unpackerr}/bin/unpackerr -c /home/colin/.config/unpackerr/unpackerr.conf";
+        Restart = "on-failure";
+        RestartSec = "5s";
+        WorkingDirectory = "/home/colin";
+        Environment = [
+          "TZ=America/Los_Angeles"
+        ];
+      };
     };
     services.caddy = {
       enable = true;
@@ -154,16 +230,25 @@
       virtualHosts."sonarr.nixlab.brucebrus.org".extraConfig = ''
         reverse_proxy localhost:8989
       '';
+      virtualHosts."lidarr.nixlab.brucebrus.org".extraConfig = ''
+        reverse_proxy localhost:8686
+      '';
       virtualHosts."ha.nixlab.brucebrus.org".extraConfig = ''
         reverse_proxy localhost:8123
+      '';
+      virtualHosts."slskd.nixlab.brucebrus.org".extraConfig = ''
+        reverse_proxy 127.0.0.1:5030
+      '';
+      virtualHosts."unpackerr.nixlab.brucebrus.org".extraConfig = ''
+        reverse_proxy localhost:5656
       '';
 
       package = pkgs-unstable.caddy.withPlugins {
         plugins = [
-          "github.com/lucaslorentz/caddy-docker-proxy/v2@v2.9.2"
-          "github.com/caddy-dns/cloudflare@v0.1.0"
+          "github.com/lucaslorentz/caddy-docker-proxy/v2@v2.10.0"
+          "github.com/caddy-dns/cloudflare@v0.2.1"
         ];
-        hash = "sha256-OgQy6Fg0zNOUsIrL+cQ/XnJgX+TyfZyu2rjCVdafzyk=";
+        hash = "sha256-ANoTHDn9Pl+q70k3FRo1cxNYF//uYBQbgW+NFq4EUIo=";
       };
     };
 
@@ -194,6 +279,7 @@
     # Common packages (vim, git, python3, pinentry-curses) moved to common/nixos-base.nix
     environment.systemPackages = [
       # Add any nixlab-specific system packages here if needed
+      unpackerr
     ];
 
     # security.sudo.wheelNeedsPassword = false; # Moved to common/linux-base.nix
@@ -251,11 +337,12 @@
           _1password-cli
         ];
         nixosConfig = config;
+        inherit pkgs-unstable;
       };
     };
 
     services.cloud-init.network.enable = true;
     # Update state version for consistency
-    system.stateVersion = lib.mkDefault "24.11";
+    system.stateVersion = lib.mkDefault "25.05";
   };
 }
