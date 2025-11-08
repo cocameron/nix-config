@@ -8,6 +8,7 @@
           dolphin
         ];
       })
+      boilr
     ];
 
     programs.steam = {

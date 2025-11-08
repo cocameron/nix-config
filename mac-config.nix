@@ -5,31 +5,47 @@
 }:
 {
   imports = [
+    #inputs.mac-app-util.darwinModules.default
     inputs.home-manager.darwinModules.home-manager
+    (
+      { ... }:
+      {
+        home-manager.sharedModules = [
+          # inputs.mac-app-util.homeManagerModules.default
+        ];
+      }
+    )
     inputs.nix-homebrew.darwinModules.nix-homebrew
     ./modules/common/base.nix
   ];
-  environment.systemPackages = [
-    pkgs.vim
-    pkgs.raycast
-    pkgs.pinentry_mac
-  ];
-  security.pam.enableSudoTouchIdAuth = true;
+
+  security.pam.services.sudo_local.touchIdAuth = true;
 
   users.users.colin = {
     home = "/Users/colin";
   };
 
+  environment.systemPackages = with pkgs; [
+    discord
+    raycast
+    pinentry_mac
+  ];
+
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "backup";
-    users.colin = import ./modules/common/home-manager/home.nix;
+    users.colin = { ... }: {
+      imports = [
+        ./modules/common/home-manager/home.nix
+        ./modules/mac/home-manager
+      ];
+    };
     extraSpecialArgs = {
       machinePackages = [ ];
     };
   };
-
+  system.primaryUser = "colin";
   nix-homebrew = {
     enable = true;
     enableRosetta = true;
@@ -51,7 +67,21 @@
       "1password-cli"
       "1password"
       "ghostty"
-    ];
+      "steam"
+      #   "ubiquiti-unifi-controller"
+      #   "logitune"
+      #   "zoom"
+      #   "netspot"
+      #   "tailscale"
+      #   "orbstack"
+      #   "rectangle-pro"
+      #   "hiddenbar"
+      #   "windows-app"
+      #   "vlc"
+      #   "firefox"
+      #   "raycast"
+      #   "pinentry-mac"
+    ];#   
   };
 
   system.configurationRevision = inputs.rev or inputs.dirtyRev or null;

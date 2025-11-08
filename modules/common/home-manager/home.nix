@@ -27,10 +27,10 @@
           imagemagick
           libxml2
           tectonic
-          nodejs_23
+          nodejs_24
           fzf
           ghostscript
-          boilr
+          claude-code
         ]
         ++ config.local.machinePackages;
       sessionVariables = {
@@ -44,9 +44,12 @@
       git = {
         enable = true;
         lfs.enable = true;
-
-        userName = "Colin Cameron";
-        userEmail = "me@ccameron.net";
+        settings = {
+          user = {
+            name = "Colin Cameron";
+            email = "me@ccameron.net";
+          };
+        };
 
         signing = {
           key = "08F3DF9DA5BD0D49E1B051FDBFC758DC84917FF4";
