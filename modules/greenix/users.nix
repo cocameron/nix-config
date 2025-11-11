@@ -11,14 +11,15 @@ _: {
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
-      users.colin =
-        { ... }:
-        {
-          imports = [
-            ../common/home-manager/home.nix # Common home-manager config
-            ./home-manager # Greenix specific home-manager config (new location)
-          ];
-        };
+      users.colin = { ... }: {
+        imports = [
+          ../common/home-manager/home.nix
+          ./home-manager
+        ];
+      };
+      extraSpecialArgs = {
+        machinePackages = [ ];
+      };
     };
   };
 }

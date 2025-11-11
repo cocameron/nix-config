@@ -1,0 +1,240 @@
+{
+  "id": null,
+  "title": "Arr Services",
+  "tags": ["arr", "nixlab"],
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "System Health Issues",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "radarr_system_health_issues",
+          "legendFormat": "Radarr Issues",
+          "datasource": "VictoriaMetrics"
+        },
+        {
+          "expr": "sonarr_system_health_issues",
+          "legendFormat": "Sonarr Issues",
+          "datasource": "VictoriaMetrics"
+        },
+        {
+          "expr": "lidarr_system_health_issues",
+          "legendFormat": "Lidarr Issues",
+          "datasource": "VictoriaMetrics"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": 0 },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 3 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Indexer Failure Rate",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "rate(prowlarr_indexer_failed_queries_total[5m]) / rate(prowlarr_indexer_queries_total[5m]) * 100",
+          "legendFormat": "Failed %",
+          "datasource": "VictoriaMetrics"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 8, "x": 8, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 10 },
+              { "color": "red", "value": 25 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Slow Indexers",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "prowlarr_indexer_average_response_time_ms",
+          "legendFormat": "{{indexer}}",
+          "datasource": "VictoriaMetrics"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 2000 },
+              { "color": "red", "value": 5000 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Stale Missing Content",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "radarr_movie_missing_total",
+          "legendFormat": "Missing Movies",
+          "datasource": "VictoriaMetrics"
+        },
+        {
+          "expr": "sonarr_episode_missing_total",
+          "legendFormat": "Missing Episodes",
+          "datasource": "VictoriaMetrics"
+        },
+        {
+          "expr": "lidarr_albums_missing_total",
+          "legendFormat": "Missing Albums",
+          "datasource": "VictoriaMetrics"
+        }
+      ],
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 4 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "red", "value": 200 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Quality Issues",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "radarr_movie_cutoff_unmet_total",
+          "legendFormat": "Movies Below Quality",
+          "datasource": "VictoriaMetrics"
+        },
+        {
+          "expr": "sonarr_episode_cutoff_unmet_total",
+          "legendFormat": "Episodes Below Quality",
+          "datasource": "VictoriaMetrics"
+        }
+      ],
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 4 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 20 },
+              { "color": "red", "value": 100 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Download Activity (Problems = Low Activity)",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "increase(radarr_movie_downloaded_total[6h])",
+          "legendFormat": "Movies/6h",
+          "datasource": "VictoriaMetrics"
+        },
+        {
+          "expr": "increase(sonarr_episode_downloaded_total[6h])",
+          "legendFormat": "Episodes/6h",
+          "datasource": "VictoriaMetrics"
+        },
+        {
+          "expr": "increase(lidarr_songs_downloaded_total[6h])",
+          "legendFormat": "Songs/6h",
+          "datasource": "VictoriaMetrics"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 10 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Indexer Query vs Success Rate",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "rate(prowlarr_indexer_queries_total[5m])",
+          "legendFormat": "Queries/sec",
+          "datasource": "VictoriaMetrics"
+        },
+        {
+          "expr": "rate(prowlarr_indexer_grabs_total[5m])",
+          "legendFormat": "Successful Grabs/sec",
+          "datasource": "VictoriaMetrics"
+        },
+        {
+          "expr": "rate(prowlarr_indexer_failed_queries_total[5m])",
+          "legendFormat": "Failed Queries/sec",
+          "datasource": "VictoriaMetrics"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Arr Service Errors & Warnings",
+      "type": "logs",
+      "targets": [
+        {
+          "expr": "{job=\"systemd-journal\",instance=\"nixlab\",unit=~\"radarr.service|sonarr.service|lidarr.service|prowlarr.service\",priority=~\"0|1|2|3|4\"}",
+          "datasource": "VictoriaLogs"
+        }
+      ],
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 18 },
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending",
+        "dedupStrategy": "none"
+      }
+    }
+  ]
+}

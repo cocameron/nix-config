@@ -12,6 +12,8 @@
   config = {
     home.packages = [
       pkgs-unstable.claude-code
+      pkgs-unstable.wrtag
+      pkgs-unstable.essentia-extractor
     ];
     services.podman = {
       enable = true;
@@ -38,10 +40,10 @@
             VPN_TYPE = "wireguard";
             PORT_FORWARD_ONLY = "on";
             VPN_PORT_FORWARDING = "on";
-            VPN_PORT_FORWARDING_UP_COMMAND = "\\\"/bin/sh -c '/config/assign-ports.sh qbit {{PORTS}}'\\\"";
             HTTPPROXY = "on";
             SHADOWSOCKS = "on";
           };
+          environmentFile = [ "/home/colin/.config/gluetun/gluetun-qbt.env" ];
         };
         
         # Second gluetun instance for slskd
@@ -49,6 +51,7 @@
           image = "qmcgaw/gluetun";
           addCapabilities = [ "NET_ADMIN" ];
           devices = [ "/dev/net/tun:/dev/net/tun" ];
+          extraPodmanArgs = [ "--add-host=host.containers.internal:host-gateway" ];
           volumes = [
             "/home/colin/.config/gluetun:/config"
             "/run/secrets/wireguard_private_key:/run/secrets/wireguard_private_key:ro"
@@ -64,8 +67,9 @@
             VPN_TYPE = "wireguard";
             PORT_FORWARD_ONLY = "on";
             VPN_PORT_FORWARDING = "on";
-            VPN_PORT_FORWARDING_UP_COMMAND = "\\\"/bin/sh -c '/config/assign-ports.sh slskd {{PORTS}}'\\\"";
+            VPN_PORT_FORWARDING_UP_COMMAND = "/bin/sh -c '/config/assign-ports.sh slskd {{PORTS}}'";
             SHADOWSOCKS = "on";
+            FIREWALL_OUTBOUND_SUBNETS = "169.254.0.0/16";
           };
         };
         
@@ -97,6 +101,7 @@
           volumes = [
             "/home/colin/.config/slskd:/app"
             "/mnt/nfs/content:/data"
+            "/mnt/nfs/content/media/music:/music:ro"
             "/run/secrets/slskd_pass:/run/secrets/slskd_pass:ro"
           ];
           extraConfig = {
@@ -109,7 +114,6 @@
             SLSKD_HTTP_PORT = "5030";
             SLSKD_REMOTE_CONFIGURATION = "true";
             # SLSKD_LISTEN_PORT removed - will use YAML config updated by assign-ports.sh
-            SLSKD_SHARED_DIR = "/data/slsk";
             SLSKD_DOWNLOADS_DIR = "/data/slsk";
           };
         };
@@ -143,7 +147,27 @@
         WantedBy = [ "timers.target" ];
       };
     };
-    
+
+    # wrtagweb service for automatic music tagging from slskd
+    systemd.user.services.wrtagweb = {
+      Unit = {
+        Description = "wrtagweb - web interface for wrtag";
+        After = [ "podman-slskd.service" ];
+      };
+      Service = {
+        Type = "simple";
+        ExecStart = "${pkgs-unstable.wrtag}/bin/wrtagweb";
+        Restart = "always";
+        RestartSec = "10s";
+        Environment = [
+          "WRTAG_CONFIG_PATH=/home/colin/.config/wrtag/config"
+        ];
+      };
+      Install = {
+        WantedBy = [ "default.target" ];
+      };
+    };
+
     home.stateVersion = "25.05";
   };
 }

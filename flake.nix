@@ -1,23 +1,11 @@
 {
   inputs = {
-<<<<<<< Updated upstream
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    unstableNixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.url = "github:nix-community/home-manager/master";
-=======
-    # Use nixos-25.05 channel for NixOS systems and potentially Darwin
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
-    unstableNixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nix-darwin.url = "github:LnL7/nix-darwin/nix-darwin-25.05";
-    # Darwin can follow the main nixpkgs input
-    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
-    home-manager.url = "github:nix-community/home-manager/release-25.05";
->>>>>>> Stashed changes
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
-    nix-homebrew.inputs.nixpkgs.follows = "nixpkgs";
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -28,7 +16,6 @@
     #};
 
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
-    quadlet-nix.inputs.nixpkgs.follows = "nixpkgs";
 
     # Optional: Declarative tap management
     homebrew-core = {
@@ -54,13 +41,12 @@
       self,
       nix-darwin,
       nixpkgs,
-      unstableNixpkgs,
 
       ...
     }@inputs:
     let
       # Define pkgs-unstable once for Linux systems
-      pkgs-unstable-linux = import inputs.unstableNixpkgs {
+      pkgs-unstable-linux = import inputs.nixpkgs {
         system = "x86_64-linux";
         config.allowUnfree = true;
       };

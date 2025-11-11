@@ -1,0 +1,75 @@
+{
+  "id": null,
+  "title": "System Logs",
+  "tags": ["logs", "nixlab"],
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Recent Service Errors",
+      "type": "logs",
+      "targets": [
+        {
+          "expr": "{job=\"systemd-journal\",instance=\"nixlab\"} i(error)",
+          "datasource": "VictoriaLogs"
+        }
+      ],
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 0 },
+      "options": {
+        "showTime": true,
+        "showLabels": false,
+        "showCommonLabels": true,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending"
+      }
+    },
+    {
+      "id": 2,
+      "title": "Critical/Warning Messages",
+      "type": "logs",
+      "targets": [
+        {
+          "expr": "{job=\"systemd-journal\",instance=\"nixlab\"} i(critical) OR i(warning)",
+          "datasource": "VictoriaLogs"
+        }
+      ],
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 12 },
+      "options": {
+        "showTime": true,
+        "showLabels": false,
+        "showCommonLabels": true,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending"
+      }
+    },
+    {
+      "id": 3,
+      "title": "Log Count by Level",
+      "type": "table",
+      "targets": [
+        {
+          "expr": "{job=\"systemd-journal\",instance=\"nixlab\"} | stats by (level) count() as total",
+          "datasource": "VictoriaLogs"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "options": {
+        "showHeader": true,
+        "sortBy": [
+          {
+            "displayName": "total",
+            "desc": true
+          }
+        ]
+      },
+      "fieldConfig": {
+        "defaults": {}
+      }
+    }
+  ]
+}

@@ -1,0 +1,279 @@
+{
+  "id": null,
+  "title": "Media Services",
+  "tags": ["media", "nixlab"],
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Total Torrents",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "qbittorrent_global_torrents",
+          "legendFormat": "Total",
+          "datasource": "VictoriaMetrics"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 200 },
+              { "color": "red", "value": 500 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Download Speed",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "qbittorrent_global_download_speed_bytes",
+          "legendFormat": "Download",
+          "datasource": "VictoriaMetrics"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 5, "x": 4, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 10485760 },
+              { "color": "red", "value": 52428800 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Upload Speed",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "qbittorrent_global_upload_speed_bytes",
+          "legendFormat": "Upload",
+          "datasource": "VictoriaMetrics"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 5, "x": 9, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps",
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1048576 },
+              { "color": "red", "value": 5242880 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Global Ratio",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "qbittorrent_global_ratio",
+          "legendFormat": "Ratio",
+          "datasource": "VictoriaMetrics"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 5, "x": 14, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 2,
+          "thresholds": {
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 0.8 },
+              { "color": "green", "value": 1.0 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Media Storage",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "100 - (node_filesystem_avail_bytes{instance=\"nixlab\",mountpoint=\"/mnt/nfs\"} / node_filesystem_size_bytes{instance=\"nixlab\",mountpoint=\"/mnt/nfs\"} * 100)",
+          "legendFormat": "NFS %",
+          "datasource": "VictoriaMetrics"
+        }
+      ],
+      "gridPos": { "h": 4, "w": 5, "x": 19, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 80 },
+              { "color": "red", "value": 90 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "qBittorrent Transfer Speeds",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "qbittorrent_global_download_speed_bytes",
+          "legendFormat": "Download Speed",
+          "datasource": "VictoriaMetrics"
+        },
+        {
+          "expr": "qbittorrent_global_upload_speed_bytes",
+          "legendFormat": "Upload Speed",
+          "datasource": "VictoriaMetrics"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Torrent States",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "count by (state) (qbittorrent_torrent_states)",
+          "legendFormat": "{{state}}",
+          "datasource": "VictoriaMetrics"
+        }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 5 },
+              { "color": "red", "value": 15 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Session Transfer",
+      "type": "bargauge",
+      "targets": [
+        {
+          "expr": "qbittorrent_global_session_downloaded_bytes",
+          "legendFormat": "Downloaded This Session",
+          "datasource": "VictoriaMetrics"
+        },
+        {
+          "expr": "qbittorrent_global_session_uploaded_bytes",
+          "legendFormat": "Uploaded This Session",
+          "datasource": "VictoriaMetrics"
+        }
+      ],
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 12 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        }
+      },
+      "options": {
+        "displayMode": "list",
+        "orientation": "horizontal"
+      }
+    },
+    {
+      "id": 9,
+      "title": "Torrent Categories",
+      "type": "stat",
+      "targets": [
+        {
+          "expr": "qbittorrent_global_categories",
+          "legendFormat": "{{category}}",
+          "datasource": "VictoriaMetrics"
+        }
+      ],
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 12 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "title": "All-Time Transfer",
+      "type": "bargauge",
+      "targets": [
+        {
+          "expr": "qbittorrent_global_alltime_downloaded_bytes",
+          "legendFormat": "All-Time Downloaded",
+          "datasource": "VictoriaMetrics"
+        },
+        {
+          "expr": "qbittorrent_global_alltime_uploaded_bytes",
+          "legendFormat": "All-Time Uploaded",
+          "datasource": "VictoriaMetrics"
+        }
+      ],
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 18 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        }
+      },
+      "options": {
+        "displayMode": "list",
+        "orientation": "horizontal"
+      }
+    },
+    {
+      "id": 11,
+      "title": "Media Service Errors & Warnings",
+      "type": "logs",
+      "targets": [
+        {
+          "expr": "{job=\"systemd-journal\",instance=\"nixlab\",unit=~\"qbittorrent.service|jellyfin.service|plex.service\",priority=~\"0|1|2|3|4\"}",
+          "datasource": "VictoriaLogs"
+        }
+      ],
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 24 },
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending",
+        "dedupStrategy": "none"
+      }
+    }
+  ]
+}

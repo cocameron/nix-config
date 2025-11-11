@@ -31,11 +31,6 @@
           nodejs_24
           fzf
           ghostscript
-<<<<<<< Updated upstream
-          claude-code
-=======
-	  pkgs-unstable.claude-code
->>>>>>> Stashed changes
         ]
         ++ config.local.machinePackages;
       sessionVariables = {
