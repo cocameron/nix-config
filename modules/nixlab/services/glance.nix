@@ -1,5 +1,9 @@
-{ lib, ... }:
-
+{ lib, pkgs, ... }:
+let
+  qbittorrent-stats = import ./qbittorrent-stats.nix;
+  proxmox = import ./proxmox-detailed-resources.nix;
+  plex = import ./plex-playing.nix;
+in
 {
   services.glance = {
     enable = true;
@@ -74,7 +78,7 @@
                     {
                       title = "Slskd";
                       url = "https://slskd.nixlab.brucebrus.org";
-                      check-url = "http://localhost:5030";
+                      check-url = "http://127.0.0.1:5030/health";
                     }
                     {
                       title = "Caddy";
@@ -83,8 +87,13 @@
                     }
                   ];
                 }
+                qbittorrent-stats
+		proxmox
+		plex
                 {
-                  type = "calendar";
+                  type = "iframe";
+                  source = "https://grafana.nixlab.brucebrus.org/d-solo/ab45f308-4dd8-4010-908c-77a58080ca71/nixlab-system-overview?orgId=1&from=1763010772964&to=1763014372964&timezone=browser&refresh=30s&panelId=panel-1&__feature.dashboardSceneSolo=true";
+                  height = 200;
                 }
               ];
             }

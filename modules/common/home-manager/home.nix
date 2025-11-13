@@ -31,6 +31,8 @@
           nodejs_24
           fzf
           ghostscript
+	  jq
+	  flac
         ]
         ++ config.local.machinePackages;
       sessionVariables = {

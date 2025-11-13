@@ -38,6 +38,7 @@ in
         admin_user = "admin";
         admin_password = "$__file{${config.sops.secrets.grafana_admin_password.path}}";
         secret_key = "$__file{${config.sops.secrets.grafana_secret_key.path}}";
+        allow_embedding = true;
       };
       database = {
         type = "sqlite3";
@@ -157,6 +158,380 @@ in
               };
               labels = {
                 severity = "critical";
+              };
+            }
+            {
+              uid = "memory-critical";
+              title = "Memory Usage Critical";
+              condition = "A";
+              data = [
+                {
+                  refId = "A";
+                  datasourceUid = "victoriametrics";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 300;
+                    to = 0;
+                  };
+                  datasource = {
+                    type = "prometheus";
+                    uid = "victoriametrics";
+                  };
+                  model = {
+                    expr = "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90";
+                    refId = "A";
+                  };
+                }
+              ];
+              noDataState = "NoData";
+              execErrState = "Alerting";
+              for_ = "5m";
+              annotations = {
+                summary = "Memory usage critical on nixlab";
+                description = "Memory usage is above 90% for 5 minutes";
+              };
+              labels = {
+                severity = "critical";
+              };
+            }
+            {
+              uid = "memory-warning";
+              title = "Memory Usage Warning";
+              condition = "A";
+              data = [
+                {
+                  refId = "A";
+                  datasourceUid = "victoriametrics";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 300;
+                    to = 0;
+                  };
+                  datasource = {
+                    type = "prometheus";
+                    uid = "victoriametrics";
+                  };
+                  model = {
+                    expr = "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 80";
+                    refId = "A";
+                  };
+                }
+              ];
+              noDataState = "NoData";
+              execErrState = "Alerting";
+              for_ = "10m";
+              annotations = {
+                summary = "Memory usage warning on nixlab";
+                description = "Memory usage is above 80% for 10 minutes";
+              };
+              labels = {
+                severity = "warning";
+              };
+            }
+            {
+              uid = "cpu-high";
+              title = "CPU Usage High";
+              condition = "A";
+              data = [
+                {
+                  refId = "A";
+                  datasourceUid = "victoriametrics";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 300;
+                    to = 0;
+                  };
+                  datasource = {
+                    type = "prometheus";
+                    uid = "victoriametrics";
+                  };
+                  model = {
+                    expr = "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100) > 80";
+                    refId = "A";
+                  };
+                }
+              ];
+              noDataState = "NoData";
+              execErrState = "Alerting";
+              for_ = "10m";
+              annotations = {
+                summary = "CPU usage high on nixlab";
+                description = "CPU usage is above 80% for 10 minutes";
+              };
+              labels = {
+                severity = "warning";
+              };
+            }
+            {
+              uid = "nfs-mount-unavailable";
+              title = "NFS Mount Unavailable";
+              condition = "A";
+              data = [
+                {
+                  refId = "A";
+                  datasourceUid = "victoriametrics";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 300;
+                    to = 0;
+                  };
+                  datasource = {
+                    type = "prometheus";
+                    uid = "victoriametrics";
+                  };
+                  model = {
+                    expr = "absent(node_filesystem_avail_bytes{mountpoint=\"/mnt/nfs\"})";
+                    refId = "A";
+                  };
+                }
+              ];
+              noDataState = "OK";
+              execErrState = "Alerting";
+              for_ = "2m";
+              annotations = {
+                summary = "NFS mount unavailable on nixlab";
+                description = "The NFS mount at /mnt/nfs is not available";
+              };
+              labels = {
+                severity = "critical";
+              };
+            }
+            {
+              uid = "service-crash-loop";
+              title = "Service Crash Loop Detected";
+              condition = "A";
+              data = [
+                {
+                  refId = "A";
+                  datasourceUid = "victoriametrics";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 900;
+                    to = 0;
+                  };
+                  datasource = {
+                    type = "prometheus";
+                    uid = "victoriametrics";
+                  };
+                  model = {
+                    expr = "rate(node_systemd_unit_state{state=\"failed\"}[15m]) > 0";
+                    refId = "A";
+                  };
+                }
+              ];
+              noDataState = "NoData";
+              execErrState = "Alerting";
+              for_ = "5m";
+              annotations = {
+                summary = "Service crash loop detected on nixlab";
+                description = "A systemd service is repeatedly failing";
+              };
+              labels = {
+                severity = "critical";
+              };
+            }
+            {
+              uid = "systemd-service-failed";
+              title = "Systemd Service Failed";
+              condition = "A";
+              data = [
+                {
+                  refId = "A";
+                  datasourceUid = "victoriametrics";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 300;
+                    to = 0;
+                  };
+                  datasource = {
+                    type = "prometheus";
+                    uid = "victoriametrics";
+                  };
+                  model = {
+                    expr = "node_systemd_unit_state{state=\"failed\"} == 1";
+                    refId = "A";
+                  };
+                }
+              ];
+              noDataState = "NoData";
+              execErrState = "Alerting";
+              for_ = "2m";
+              annotations = {
+                summary = "Systemd service failed on nixlab";
+                description = "A systemd service is in failed state";
+              };
+              labels = {
+                severity = "warning";
+              };
+            }
+            {
+              uid = "load-average-high";
+              title = "Load Average High";
+              condition = "A";
+              data = [
+                {
+                  refId = "A";
+                  datasourceUid = "victoriametrics";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 300;
+                    to = 0;
+                  };
+                  datasource = {
+                    type = "prometheus";
+                    uid = "victoriametrics";
+                  };
+                  model = {
+                    expr = "node_load15 / count(node_cpu_seconds_total{mode=\"idle\"}) > 2";
+                    refId = "A";
+                  };
+                }
+              ];
+              noDataState = "NoData";
+              execErrState = "Alerting";
+              for_ = "15m";
+              annotations = {
+                summary = "Load average high on nixlab";
+                description = "15-minute load average is more than 2x the CPU count";
+              };
+              labels = {
+                severity = "warning";
+              };
+            }
+            {
+              uid = "system-temperature-high";
+              title = "System Temperature High";
+              condition = "A";
+              data = [
+                {
+                  refId = "A";
+                  datasourceUid = "victoriametrics";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 300;
+                    to = 0;
+                  };
+                  datasource = {
+                    type = "prometheus";
+                    uid = "victoriametrics";
+                  };
+                  model = {
+                    expr = "node_hwmon_temp_celsius > 80";
+                    refId = "A";
+                  };
+                }
+              ];
+              noDataState = "NoData";
+              execErrState = "OK";
+              for_ = "5m";
+              annotations = {
+                summary = "System temperature high on nixlab";
+                description = "System temperature is above 80°C";
+              };
+              labels = {
+                severity = "warning";
+              };
+            }
+            {
+              uid = "qbittorrent-exporter-down";
+              title = "qBittorrent Exporter Down";
+              condition = "A";
+              data = [
+                {
+                  refId = "A";
+                  datasourceUid = "victoriametrics";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 300;
+                    to = 0;
+                  };
+                  datasource = {
+                    type = "prometheus";
+                    uid = "victoriametrics";
+                  };
+                  model = {
+                    expr = "up{job=\"qbittorrent\"} == 0";
+                    refId = "A";
+                  };
+                }
+              ];
+              noDataState = "OK";
+              execErrState = "Alerting";
+              for_ = "3m";
+              annotations = {
+                summary = "qBittorrent exporter down on nixlab";
+                description = "Unable to scrape qBittorrent metrics";
+              };
+              labels = {
+                severity = "warning";
+              };
+            }
+            {
+              uid = "disk-io-saturation";
+              title = "Disk I/O Saturation";
+              condition = "A";
+              data = [
+                {
+                  refId = "A";
+                  datasourceUid = "victoriametrics";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 300;
+                    to = 0;
+                  };
+                  datasource = {
+                    type = "prometheus";
+                    uid = "victoriametrics";
+                  };
+                  model = {
+                    expr = "rate(node_disk_io_time_seconds_total[5m]) > 0.9";
+                    refId = "A";
+                  };
+                }
+              ];
+              noDataState = "NoData";
+              execErrState = "Alerting";
+              for_ = "10m";
+              annotations = {
+                summary = "Disk I/O saturation on nixlab";
+                description = "Disk I/O utilization is above 90% for 10 minutes";
+              };
+              labels = {
+                severity = "warning";
+              };
+            }
+            {
+              uid = "network-errors-high";
+              title = "Network Errors High";
+              condition = "A";
+              data = [
+                {
+                  refId = "A";
+                  datasourceUid = "victoriametrics";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 300;
+                    to = 0;
+                  };
+                  datasource = {
+                    type = "prometheus";
+                    uid = "victoriametrics";
+                  };
+                  model = {
+                    expr = "rate(node_network_receive_errs_total[5m]) > 10 or rate(node_network_transmit_errs_total[5m]) > 10";
+                    refId = "A";
+                  };
+                }
+              ];
+              noDataState = "NoData";
+              execErrState = "Alerting";
+              for_ = "5m";
+              annotations = {
+                summary = "Network errors high on nixlab";
+                description = "Network interface is experiencing high error rates";
+              };
+              labels = {
+                severity = "warning";
               };
             }
           ];

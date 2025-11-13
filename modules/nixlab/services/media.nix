@@ -36,7 +36,6 @@ in
   services.lidarr = {
     enable = true;
     user = "colin";
-    dataDir = "/mnt/nfs/content/media/music";
     settings = {
       update = {
         mechanism = "builtIn";

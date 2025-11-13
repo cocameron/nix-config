@@ -87,6 +87,14 @@
           owner = "root";
           mode = "0400";
         };
+	proxmox_token = {
+	  owner = "root";
+	  mode = "0400";
+	};
+	plex_token = {
+	  owner = "root";
+	  mode = "0400";
+	};
       };
 
       templates."caddy-cloudflare-env" = {

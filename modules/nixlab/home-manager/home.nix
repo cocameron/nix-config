@@ -23,6 +23,7 @@
           image = "qmcgaw/gluetun";
           addCapabilities = [ "NET_ADMIN" ];
           devices = [ "/dev/net/tun:/dev/net/tun" ];
+          extraPodmanArgs = [ "--add-host=host.containers.internal:host-gateway" ];
           volumes = [
             "/home/colin/.config/gluetun:/config"
             "/run/secrets/wireguard_private_key:/run/secrets/wireguard_private_key:ro"
@@ -40,8 +41,10 @@
             VPN_TYPE = "wireguard";
             PORT_FORWARD_ONLY = "on";
             VPN_PORT_FORWARDING = "on";
+            #VPN_PORT_FORWARDING_UP_COMMAND = "/bin/sh -c '/config/assign-ports.sh qbit {{PORTS}}'";
             HTTPPROXY = "on";
             SHADOWSOCKS = "on";
+            FIREWALL_OUTBOUND_SUBNETS = "169.254.0.0/16";
           };
           environmentFile = [ "/home/colin/.config/gluetun/gluetun-qbt.env" ];
         };
