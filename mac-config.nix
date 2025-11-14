@@ -3,9 +3,12 @@
   pkgs,
   ...
 }:
+let
+  constants = import ./modules/common/constants.nix;
+in
 {
   imports = [
-    #inputs.mac-app-util.darwinModules.default
+    # inputs.mac-app-util.darwinModules.default
     inputs.home-manager.darwinModules.home-manager
     (
       { ... }:
@@ -21,8 +24,8 @@
 
   security.pam.services.sudo_local.touchIdAuth = true;
 
-  users.users.colin = {
-    home = "/Users/colin";
+  users.users.${constants.primaryUser} = {
+    home = "/Users/${constants.primaryUser}";
   };
 
   environment.systemPackages = with pkgs; [
@@ -35,7 +38,7 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "backup";
-    users.colin = { ... }: {
+    users.${constants.primaryUser} = { ... }: {
       imports = [
         ./modules/common/home-manager/home.nix
         ./modules/mac/home-manager
@@ -45,11 +48,11 @@
       machinePackages = [ ];
     };
   };
-  system.primaryUser = "colin";
+  system.primaryUser = constants.primaryUser;
   nix-homebrew = {
     enable = true;
     enableRosetta = true;
-    user = "colin";
+    user = constants.primaryUser;
     autoMigrate = true;
   };
 

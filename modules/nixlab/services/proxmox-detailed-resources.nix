@@ -1,6 +1,7 @@
   {
     type = "custom-api";
     title = "Proxmox-VE Resources";
+    hide-header = true;
     cache = "1m";
     url = "http://192.168.1.222:8006/api2/json/cluster/resources";
     allow-insecure = true;

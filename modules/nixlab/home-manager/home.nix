@@ -5,6 +5,9 @@
   pkgs-unstable,
   ...
 }:
+let
+  constants = import ../../common/constants.nix;
+in
 {
   imports = [
     ../../common/home-manager/home.nix
@@ -25,7 +28,7 @@
           devices = [ "/dev/net/tun:/dev/net/tun" ];
           extraPodmanArgs = [ "--add-host=host.containers.internal:host-gateway" ];
           volumes = [
-            "/home/colin/.config/gluetun:/config"
+            "/home/${constants.primaryUser}/.config/gluetun:/config"
             "/run/secrets/wireguard_private_key:/run/secrets/wireguard_private_key:ro"
           ];
           ports = [
@@ -36,7 +39,7 @@
           ];
           environment = {
             WIREGUARD_MTU = 1320;
-            TZ = "America/Los_Angeles";
+            TZ = constants.timezone;
             VPN_SERVICE_PROVIDER = "protonvpn";
             VPN_TYPE = "wireguard";
             PORT_FORWARD_ONLY = "on";
@@ -56,7 +59,7 @@
           devices = [ "/dev/net/tun:/dev/net/tun" ];
           extraPodmanArgs = [ "--add-host=host.containers.internal:host-gateway" ];
           volumes = [
-            "/home/colin/.config/gluetun:/config"
+            "/home/${constants.primaryUser}/.config/gluetun:/config"
             "/run/secrets/wireguard_private_key:/run/secrets/wireguard_private_key:ro"
           ];
           ports = [
@@ -65,7 +68,7 @@
           ];
           environment = {
             WIREGUARD_MTU = 1320;
-            TZ = "America/Los_Angeles";
+            TZ = constants.timezone;
             VPN_SERVICE_PROVIDER = "protonvpn";
             VPN_TYPE = "wireguard";
             PORT_FORWARD_ONLY = "on";
@@ -80,7 +83,7 @@
           image = "qbittorrentofficial/qbittorrent-nox";
           userNS = "keep-id";
           volumes = [
-            "/home/colin/.config/qbittorrent:/config"
+            "/home/${constants.primaryUser}/.config/qbittorrent:/config"
             "/mnt/nfs/content:/data"
           ];
           extraConfig = {
@@ -89,7 +92,7 @@
           };
           network = lib.mkForce [ "container:gluetun-qbt" ];
           environment = {
-            TZ = "America/Los_Angeles";
+            TZ = constants.timezone;
             QBT_LEGAL_NOTICE = "confirm";
             QBT_VERSION = "latest";
             QBT_WEBUI_PORT = 8200;
@@ -102,7 +105,7 @@
           image = "slskd/slskd";
           userNS = "keep-id";
           volumes = [
-            "/home/colin/.config/slskd:/app"
+            "/home/${constants.primaryUser}/.config/slskd:/app"
             "/mnt/nfs/content:/data"
             "/mnt/nfs/content/media/music:/music:ro"
             "/run/secrets/slskd_pass:/run/secrets/slskd_pass:ro"
@@ -113,7 +116,7 @@
           };
           network = lib.mkForce [ "container:gluetun-slskd" ];
           environment = {
-            TZ = "America/Los_Angeles";
+            TZ = constants.timezone;
             SLSKD_HTTP_PORT = "5030";
             SLSKD_REMOTE_CONFIGURATION = "true";
             # SLSKD_LISTEN_PORT removed - will use YAML config updated by assign-ports.sh
@@ -133,7 +136,7 @@
       };
       Service = {
         Type = "oneshot";
-        ExecStart = "/bin/sh -c 'if [ -f /home/colin/.config/gluetun/slskd-port ]; then NEW_PORT=$(cat /home/colin/.config/gluetun/slskd-port); echo \"Updating slskd to use port $NEW_PORT\"; sed -i \"s/listen_port: [0-9]\\+/listen_port: $NEW_PORT/\" /home/colin/.config/slskd/slskd.yml && systemctl --user restart podman-slskd.service; fi'";
+        ExecStart = "/bin/sh -c 'if [ -f /home/${constants.primaryUser}/.config/gluetun/slskd-port ]; then NEW_PORT=$(cat /home/${constants.primaryUser}/.config/gluetun/slskd-port); echo \"Updating slskd to use port $NEW_PORT\"; sed -i \"s/listen_port: [0-9]\\+/listen_port: $NEW_PORT/\" /home/${constants.primaryUser}/.config/slskd/slskd.yml && systemctl --user restart podman-slskd.service; fi'";
         RemainAfterExit = false;
       };
     };
@@ -163,7 +166,7 @@
         Restart = "always";
         RestartSec = "10s";
         Environment = [
-          "WRTAG_CONFIG_PATH=/home/colin/.config/wrtag/config"
+          "WRTAG_CONFIG_PATH=/home/${constants.primaryUser}/.config/wrtag/config"
         ];
       };
       Install = {
@@ -171,6 +174,6 @@
       };
     };
 
-    home.stateVersion = "25.05";
+    home.stateVersion = "24.11";
   };
 }

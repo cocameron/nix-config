@@ -1,6 +1,7 @@
   {
     type = "custom-api";
     title = "Media Server";
+    hide-header = true;
     cache = "5m";
     options = {
       media-server = "plex";

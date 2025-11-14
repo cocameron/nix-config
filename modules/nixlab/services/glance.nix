@@ -25,6 +25,7 @@ in
                   type = "monitor";
                   cache = "1m";
                   title = "Services";
+		  hide-header = true;
                   style = "compact";
                   sites = [
                     {
@@ -81,18 +82,60 @@ in
                       check-url = "http://127.0.0.1:5030/health";
                     }
                     {
-                      title = "Caddy";
-                      url = "http://localhost:2019/metrics";
-                      check-url = "http://localhost:2019/metrics";
+                      title = "Profilarr";
+                      url = "https://profilarr.nixlab.brucebrus.org";
+                      check-url = "http://localhost:6868";
+                      icon = "si:sonarr";
+                    }
+                    {
+                      title = "wrtagweb";
+                      url = "https://wrtagweb.nixlab.brucebrus.org";
                     }
                   ];
                 }
                 qbittorrent-stats
 		proxmox
 		plex
+              ];
+            }
+            {
+              size = "small";
+              widgets = [
                 {
                   type = "iframe";
-                  source = "https://grafana.nixlab.brucebrus.org/d-solo/ab45f308-4dd8-4010-908c-77a58080ca71/nixlab-system-overview?orgId=1&from=1763010772964&to=1763014372964&timezone=browser&refresh=30s&panelId=panel-1&__feature.dashboardSceneSolo=true";
+                  hide-header = true;
+                  source = "https://grafana.nixlab.brucebrus.org/d-solo/ab45f308-4dd8-4010-908c-77a58080ca71/nixlab-system-overview?orgId=1&from=now-6h&to=now&timezone=browser&refresh=30s&panelId=panel-1&__feature.dashboardSceneSolo=true";
+                  height = 200;
+                }
+                {
+                  type = "iframe";
+                  hide-header = true;
+                  source = "https://grafana.nixlab.brucebrus.org/d-solo/ab45f308-4dd8-4010-908c-77a58080ca71/nixlab-system-overview?orgId=1&from=now-6h&to=now&timezone=browser&refresh=30s&panelId=panel-3&__feature.dashboardSceneSolo=true";
+                  height = 200;
+                }
+                {
+                  type = "dns-stats";
+                  service = "adguard";
+                  hide-header = true;
+                  url = "http://192.168.1.1:3030";  # Update with your AdGuard Home URL
+                  username = "admin";
+                  password = { _secret = "/run/secrets/adguard_password"; };
+                }
+              ];
+            }
+            {
+              size = "small";
+              widgets = [
+                {
+                  type = "iframe";
+                  hide-header = true;
+                  source = "https://grafana.nixlab.brucebrus.org/d-solo/ab45f308-4dd8-4010-908c-77a58080ca71/nixlab-system-overview?orgId=1&from=now-6h&to=now&timezone=browser&refresh=30s&panelId=panel-2&__feature.dashboardSceneSolo=true";
+                  height = 200;
+                }
+                {
+                  type = "iframe";
+                  hide-header = true;
+                  source = "https://grafana.nixlab.brucebrus.org/d-solo/ab45f308-4dd8-4010-908c-77a58080ca71/nixlab-system-overview?orgId=1&from=now-6h&to=now&timezone=browser&refresh=30s&panelId=panel-4&__feature.dashboardSceneSolo=true";
                   height = 200;
                 }
               ];

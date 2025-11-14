@@ -1,5 +1,6 @@
 {
   "id": null,
+  "uid": "ab45f308-4dd8-4010-908c-77a58080ca71",
   "title": "Nixlab System Overview",
   "tags": ["system", "nixlab"],
   "timezone": "browser",
@@ -12,11 +13,16 @@
     {
       "id": 1,
       "title": "CPU Usage",
-      "type": "stat",
+      "type": "timeseries",
       "targets": [
         {
           "expr": "100 - (avg(irate(node_cpu_seconds_total{mode=\"idle\",instance=\"nixlab\"}[5m])) * 100)",
           "legendFormat": "CPU %",
+          "datasource": "VictoriaMetrics"
+        },
+        {
+          "expr": "80",
+          "legendFormat": "Alert Threshold (80%)",
           "datasource": "VictoriaMetrics"
         }
       ],
@@ -24,24 +30,51 @@
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
-          "thresholds": {
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 70 },
-              { "color": "red", "value": 90 }
+          "min": 0,
+          "max": 100,
+          "custom": {
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "lineWidth": 2
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Alert Threshold (80%)" },
+            "properties": [
+              { "id": "custom.lineStyle", "value": { "fill": "dash" } },
+              { "id": "custom.lineWidth", "value": 2 },
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }
             ]
           }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom"
         }
       }
     },
     {
       "id": 2,
       "title": "Memory Usage",
-      "type": "stat",
+      "type": "timeseries",
       "targets": [
         {
           "expr": "100 - (node_memory_MemAvailable_bytes{instance=\"nixlab\"} / node_memory_MemTotal_bytes{instance=\"nixlab\"} * 100)",
           "legendFormat": "Memory %",
+          "datasource": "VictoriaMetrics"
+        },
+        {
+          "expr": "80",
+          "legendFormat": "Warning Threshold (80%)",
+          "datasource": "VictoriaMetrics"
+        },
+        {
+          "expr": "90",
+          "legendFormat": "Critical Threshold (90%)",
           "datasource": "VictoriaMetrics"
         }
       ],
@@ -49,24 +82,54 @@
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
-          "thresholds": {
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 70 },
-              { "color": "red", "value": 85 }
+          "min": 0,
+          "max": 100,
+          "custom": {
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "lineWidth": 2
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Warning Threshold (80%)" },
+            "properties": [
+              { "id": "custom.lineStyle", "value": { "fill": "dash" } },
+              { "id": "custom.lineWidth", "value": 2 },
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "yellow" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Critical Threshold (90%)" },
+            "properties": [
+              { "id": "custom.lineStyle", "value": { "fill": "dash" } },
+              { "id": "custom.lineWidth", "value": 2 },
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }
             ]
           }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom"
         }
       }
     },
     {
       "id": 3,
       "title": "Disk Usage",
-      "type": "stat",
+      "type": "timeseries",
       "targets": [
         {
           "expr": "100 - (node_filesystem_avail_bytes{instance=\"nixlab\",mountpoint=\"/\"} / node_filesystem_size_bytes{instance=\"nixlab\",mountpoint=\"/\"} * 100)",
           "legendFormat": "Disk %",
+          "datasource": "VictoriaMetrics"
+        },
+        {
+          "expr": "90",
+          "legendFormat": "Critical Threshold (90%)",
           "datasource": "VictoriaMetrics"
         }
       ],
@@ -74,24 +137,46 @@
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
-          "thresholds": {
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 80 },
-              { "color": "red", "value": 90 }
+          "min": 0,
+          "max": 100,
+          "custom": {
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "lineWidth": 2
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Critical Threshold (90%)" },
+            "properties": [
+              { "id": "custom.lineStyle", "value": { "fill": "dash" } },
+              { "id": "custom.lineWidth", "value": 2 },
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }
             ]
           }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom"
         }
       }
     },
     {
       "id": 4,
       "title": "Load Average",
-      "type": "stat",
+      "type": "timeseries",
       "targets": [
         {
-          "expr": "node_load1{instance=\"nixlab\"}",
-          "legendFormat": "1m",
+          "expr": "node_load15{instance=\"nixlab\"}",
+          "legendFormat": "Load 15m",
+          "datasource": "VictoriaMetrics"
+        },
+        {
+          "expr": "count(node_cpu_seconds_total{instance=\"nixlab\",mode=\"idle\"}) * 2",
+          "legendFormat": "Alert Threshold (2x CPUs)",
           "datasource": "VictoriaMetrics"
         }
       ],
@@ -100,13 +185,29 @@
         "defaults": {
           "unit": "short",
           "decimals": 2,
-          "thresholds": {
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 2 },
-              { "color": "red", "value": 4 }
+          "min": 0,
+          "custom": {
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "lineWidth": 2
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Alert Threshold (2x CPUs)" },
+            "properties": [
+              { "id": "custom.lineStyle", "value": { "fill": "dash" } },
+              { "id": "custom.lineWidth", "value": 2 },
+              { "id": "color", "value": { "mode": "fixed", "fixedColor": "red" } }
             ]
           }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom"
         }
       }
     },

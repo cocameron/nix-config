@@ -1,6 +1,11 @@
 .aider*
 caddy.env
 .env
+
+# Backup files
+*.bak
+*~
+
 # Devenv
 .devenv*
 devenv.local.nix
@@ -10,3 +15,16 @@ devenv.local.nix
 
 # pre-commit
 .pre-commit-config.yaml
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Scripts output
+scripts/**/*.txt
+scripts/**/*.log
+
+# Secrets (stored in /var/lib/sops-nix on deployed machines)
+secrets/*.yaml
+secrets/*.json

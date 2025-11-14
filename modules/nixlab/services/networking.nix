@@ -1,6 +1,7 @@
 { config, pkgs-unstable, lib, ... }:
 
 let
+  constants = import ../../common/constants.nix;
   # Map of service names to their ports
   reverseProxyServices = {
     plex = 32400;
@@ -11,19 +12,19 @@ let
     lidarr = 8686;
     ha = 8123;
     slskd = 5030;
-    unpackerr = 5656;
     grafana = 3000;
     profilarr = 6868;
     glance = 8080;
     wrtagweb = 5031;
+    romm = 8091;
   };
 
   # Services that only support IPv4 (typically containerized services)
-  ipv4OnlyServices = [ "slskd" "qbittorrent" ];
+  ipv4OnlyServices = [ "slskd" "qbittorrent" "romm" ];
 
   # Helper function to create reverse proxy virtual hosts
   mkVirtualHost = name: port: {
-    name = "${name}.nixlab.brucebrus.org";
+    name = "${name}.${constants.domain.nixlab}";
     value = {
       extraConfig = ''
         reverse_proxy ${if builtins.elem name ipv4OnlyServices then "127.0.0.1" else "localhost"}:${toString port}
@@ -47,7 +48,7 @@ in
     '';
     virtualHosts = {
       # Wildcard TLS configuration
-      "*.nixlab.brucebrus.org".extraConfig = ''
+      "*.${constants.domain.nixlab}".extraConfig = ''
         tls {
           dns cloudflare {
             api_token {$CLOUDFLARE_API_TOKEN}
@@ -55,6 +56,17 @@ in
           propagation_timeout 6m
           resolvers 1.1.1.1
         }
+      '';
+      # Base domain redirects to Glance dashboard
+      "${constants.domain.nixlab}".extraConfig = ''
+        tls {
+          dns cloudflare {
+            api_token {$CLOUDFLARE_API_TOKEN}
+          }
+          propagation_timeout 6m
+          resolvers 1.1.1.1
+        }
+        redir https://glance.${constants.domain.nixlab}{uri} permanent
       '';
     } // (builtins.listToAttrs (lib.mapAttrsToList mkVirtualHost reverseProxyServices));
 

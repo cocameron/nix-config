@@ -6,7 +6,9 @@
   pkgs-unstable ? pkgs,
   ...
 }:
-
+let
+  constants = import ../constants.nix;
+in
 {
   imports = [
     # If you want to use home-manager modules from other flakes (such as nix-colors):
@@ -17,7 +19,7 @@
   ];
   config = {
     home = {
-      username = "colin";
+      username = constants.primaryUser;
       packages =
         with pkgs;
         [
@@ -48,13 +50,13 @@
         lfs.enable = true;
         settings = {
           user = {
-            name = "Colin Cameron";
-            email = "me@ccameron.net";
+            name = constants.git.userName;
+            email = constants.git.userEmail;
           };
         };
 
         signing = {
-          key = "08F3DF9DA5BD0D49E1B051FDBFC758DC84917FF4";
+          key = constants.gpgKey;
           signByDefault = true;
         };
       };
@@ -86,7 +88,7 @@
         enable = true;
         settings = {
           no-greeting = true;
-          default-key = "08F3DF9DA5BD0D49E1B051FDBFC758DC84917FF4";
+          default-key = constants.gpgKey;
         };
       };
     };
@@ -102,7 +104,7 @@
       };
     };
     # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
-    home.stateVersion = "25.05";
+    home.stateVersion = "24.11";
   };
   options.local.machinePackages = lib.mkOption {
     default = [ ];

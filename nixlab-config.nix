@@ -7,7 +7,9 @@
   lib,
   ...
 }:
-
+let
+  constants = import ./modules/common/constants.nix;
+in
 {
   imports = [
     (modulesPath + "/profiles/qemu-guest.nix")
@@ -20,6 +22,7 @@
     ./modules/nixlab/services/networking.nix
     ./modules/nixlab/services/home-assistant.nix
     ./modules/nixlab/services/glance.nix
+    ./modules/nixlab/services/romm.nix
     ./modules/nixlab/storage.nix
   ];
 
@@ -47,11 +50,11 @@
       validateSopsFiles = false;
       secrets = {
         wireguard_private_key = {
-          owner = "colin";
+          owner = constants.primaryUser;
         };
         cloudflare_api_token = {};
         slskd_pass = {
-          owner = "colin";
+          owner = constants.primaryUser;
         };
         grafana_admin_password = {
           owner = "grafana";
@@ -87,14 +90,38 @@
           owner = "root";
           mode = "0400";
         };
-	proxmox_token = {
-	  owner = "root";
-	  mode = "0400";
-	};
-	plex_token = {
-	  owner = "root";
-	  mode = "0400";
-	};
+        proxmox_token = {
+          owner = "root";
+          mode = "0400";
+        };
+        plex_token = {
+          owner = "root";
+          mode = "0400";
+        };
+        adguard_password = {
+          owner = "root";
+          mode = "0400";
+        };
+        romm_db_password = {
+          owner = "root";
+          mode = "0400";
+        };
+        romm_db_root_password = {
+          owner = "root";
+          mode = "0400";
+        };
+        romm_auth_secret_key = {
+          owner = "root";
+          mode = "0400";
+        };
+        igdb_client_id = {
+          owner = "root";
+          mode = "0400";
+        };
+        igdb_client_secret = {
+          owner = "root";
+          mode = "0400";
+        };
       };
 
       templates."caddy-cloudflare-env" = {
@@ -105,6 +132,20 @@
       templates."qbittorrent-exporter-env" = {
         content = ''
           QBITTORRENT_PASSWORD=${config.sops.placeholder."qbittorrent_password"}
+        '';
+      };
+      templates."romm-env" = {
+        content = ''
+          DB_PASSWD=${config.sops.placeholder."romm_db_password"}
+          ROMM_AUTH_SECRET_KEY=${config.sops.placeholder."romm_auth_secret_key"}
+          IGDB_CLIENT_ID=${config.sops.placeholder."igdb_client_id"}
+          IGDB_CLIENT_SECRET=${config.sops.placeholder."igdb_client_secret"}
+        '';
+      };
+      templates."romm-db-env" = {
+        content = ''
+          MARIADB_ROOT_PASSWORD=${config.sops.placeholder."romm_db_root_password"}
+          MARIADB_PASSWORD=${config.sops.placeholder."romm_db_password"}
         '';
       };
     };
@@ -135,7 +176,7 @@
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
-      users.colin.imports = [ ./modules/nixlab/home-manager/home.nix ];
+      users.${constants.primaryUser}.imports = [ ./modules/nixlab/home-manager/home.nix ];
       extraSpecialArgs = {
         machinePackages = with pkgs; [ _1password-cli ];
         nixosConfig = config;
@@ -147,6 +188,6 @@
     services.cloud-init.network.enable = true;
 
     # State version
-    system.stateVersion = lib.mkDefault "25.05";
+    system.stateVersion = lib.mkDefault "24.11";
   };
 }

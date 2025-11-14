@@ -1,6 +1,7 @@
 { config, pkgs, pkgs-unstable, ... }:
 
 let
+  constants = import ../../common/constants.nix;
   unpackerrPkg = pkgs.callPackage ../packages/unpackerr.nix {};
 in
 
@@ -19,23 +20,23 @@ in
   in {
     enable = true;
     package = plexpass;
-    user = "colin";
+    user = constants.primaryUser;
   };
 
   # Arr Services
   services.radarr = {
     enable = true;
-    user = "colin";
+    user = constants.primaryUser;
   };
 
   services.sonarr = {
     enable = true;
-    user = "colin";
+    user = constants.primaryUser;
   };
 
   services.lidarr = {
     enable = true;
-    user = "colin";
+    user = constants.primaryUser;
     settings = {
       update = {
         mechanism = "builtIn";
@@ -54,14 +55,14 @@ in
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "simple";
-      User = "colin";
+      User = constants.primaryUser;
       Group = "users";
-      ExecStart = "${unpackerrPkg.unpackerr}/bin/unpackerr -c /home/colin/.config/unpackerr/unpackerr.conf";
+      ExecStart = "${unpackerrPkg.unpackerr}/bin/unpackerr -c /home/${constants.primaryUser}/.config/unpackerr/unpackerr.conf";
       Restart = "on-failure";
       RestartSec = "5s";
-      WorkingDirectory = "/home/colin";
+      WorkingDirectory = "/home/${constants.primaryUser}";
       Environment = [
-        "TZ=America/Los_Angeles"
+        "TZ=${constants.timezone}"
       ];
     };
   };
@@ -74,7 +75,7 @@ in
       "/var/lib/profilarr:/config"
     ];
     environment = {
-      TZ = "America/Los_Angeles";
+      TZ = constants.timezone;
     };
   };
 
@@ -91,12 +92,12 @@ in
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "simple";
-      User = "colin";
+      User = constants.primaryUser;
       Group = "users";
       ExecStart = "${pkgs-unstable.isponsorblocktv}/bin/iSponsorBlockTV";
       Restart = "on-failure";
       RestartSec = "10s";
-      WorkingDirectory = "/home/colin";
+      WorkingDirectory = "/home/${constants.primaryUser}";
       StateDirectory = "isponsorblocktv";
       StateDirectoryMode = "0755";
     };

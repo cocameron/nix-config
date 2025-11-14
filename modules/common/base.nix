@@ -1,6 +1,9 @@
 { pkgs, lib, ... }:
+let
+  constants = import ./constants.nix;
+in
 {
-  time.timeZone = "America/Los_Angeles";
+  time.timeZone = constants.timezone;
   nixpkgs.config.allowUnfree = true;
   nix = {
     gc =
@@ -26,7 +29,7 @@
     };
   };
 
-  users.users.colin = {
+  users.users.${constants.primaryUser} = {
     shell = pkgs.zsh;
   };
 

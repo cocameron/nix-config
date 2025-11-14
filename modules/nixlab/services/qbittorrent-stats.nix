@@ -1,6 +1,7 @@
 {
   type = "custom-api";
   title = "qBittorrent";
+  hide-header = true;
   cache = "10s";
   options = {
     view = "detailed";

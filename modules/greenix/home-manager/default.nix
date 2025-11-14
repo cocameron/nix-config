@@ -1,5 +1,9 @@
 { lib, ... }:
 {
+  imports = [
+    ../../common/home-manager/home.nix
+  ];
+
   programs.ghostty = {
     enable = true;
     enableBashIntegration = true;

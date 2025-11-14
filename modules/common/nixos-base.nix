@@ -4,7 +4,10 @@
   lib,
   config,
   ...
-}: # Added lib and config
+}:
+let
+  constants = import ./constants.nix;
+in
 {
   # Default hostname, can be overridden by specific machine configs
   networking.hostName = lib.mkDefault "nixos";
@@ -36,19 +39,18 @@
     };
   };
 
-  # Define base configuration for user 'colin'
+  # Define base configuration for primary user
   # Specific machines can add attributes like SSH keys.
-  users.users.colin = {
+  users.users.${constants.primaryUser} = {
     isNormalUser = true;
-    description = "colin";
+    description = constants.primaryUser;
     extraGroups = [
       "networkmanager"
       "wheel"
     ];
     # Shell is defined in common/base.nix
     openssh.authorizedKeys.keys = [
-      # Common SSH key for colin
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIWxH6KYmI6UCzu3j+HhnKMhFcDT1oyMilWG76qXF8yV"
+      constants.sshKeys.colin
     ];
     linger = true;
   };
