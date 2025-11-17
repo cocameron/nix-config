@@ -34,6 +34,11 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    cgroup-exporter = {
+      url = "github:arianvp/cgroup-exporter";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -82,6 +87,7 @@
           system = "x86_64-linux";
           modules = [
             ./nixlab-config.nix
+            inputs.cgroup-exporter.nixosModules.default
           ];
         };
 

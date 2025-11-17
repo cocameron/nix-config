@@ -48,64 +48,8 @@ in
     enable = true;
   };
 
-  # Unpackerr Service
-  systemd.services.unpackerr = {
-    description = "Unpackerr extracts downloads for Radarr, Sonarr, Lidarr, and Readarr";
-    after = [ "network.target" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "simple";
-      User = constants.primaryUser;
-      Group = "users";
-      ExecStart = "${unpackerrPkg.unpackerr}/bin/unpackerr -c /home/${constants.primaryUser}/.config/unpackerr/unpackerr.conf";
-      Restart = "on-failure";
-      RestartSec = "5s";
-      WorkingDirectory = "/home/${constants.primaryUser}";
-      Environment = [
-        "TZ=${constants.timezone}"
-      ];
-    };
-  };
+  # Unpackerr and iSponsorBlockTV moved to home-manager (home.nix)
 
-  # Profilarr - Configuration management for Radarr/Sonarr
-  virtualisation.oci-containers.containers.profilarr = {
-    image = "santiagosayshey/profilarr:latest";
-    extraOptions = [ "--network=host" ];
-    volumes = [
-      "/var/lib/profilarr:/config"
-    ];
-    environment = {
-      TZ = constants.timezone;
-    };
-  };
-
-  # Ensure profilarr data directory exists
-  systemd.tmpfiles.rules = [
-    "d /var/lib/profilarr 0755 root root -"
-  ];
-
-  # iSponsorBlockTV - Skip SponsorBlock segments on YouTube TV
-  systemd.services.isponsorblocktv = {
-    description = "SponsorBlock client for YouTube TV";
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "simple";
-      User = constants.primaryUser;
-      Group = "users";
-      ExecStart = "${pkgs-unstable.isponsorblocktv}/bin/iSponsorBlockTV";
-      Restart = "on-failure";
-      RestartSec = "10s";
-      WorkingDirectory = "/home/${constants.primaryUser}";
-      StateDirectory = "isponsorblocktv";
-      StateDirectoryMode = "0755";
-    };
-  };
-
-  # Add packages to system
-  environment.systemPackages = [
-    unpackerrPkg.unpackerr
-    pkgs-unstable.isponsorblocktv
-  ];
+  # Allow Plex on LAN interface only (not exposed to internet)
+  networking.firewall.interfaces."ens18".allowedTCPPorts = [ 32400 ];
 }

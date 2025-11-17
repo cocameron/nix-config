@@ -5,6 +5,7 @@
   services.alloy = {
     enable = true;
     configPath = "/etc/alloy/config.alloy";
+    extraFlags = [ "--disable-reporting" ];
   };
 
   # Alloy configuration for metrics and logs

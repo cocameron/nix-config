@@ -5,6 +5,9 @@ prometheus.scrape "nixlab_metrics" {
     {"__address__" = "127.0.0.1:9100", "job" = "node-exporter", "instance" = "nixlab"},
     {"__address__" = "192.168.1.1:9100", "job" = "node-exporter", "instance" = "openwrt-router"},
 
+    // Cgroup metrics (slices, memory pressure, OOM events)
+    {"__address__" = "127.0.0.1:13232", "job" = "cgroup-exporter", "instance" = "nixlab"},
+
     // VictoriaMetrics self-monitoring
     {"__address__" = "127.0.0.1:8428", "job" = "victoriametrics", "instance" = "nixlab"},
 

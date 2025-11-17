@@ -10,6 +10,13 @@ let
 in
 
 {
+  # Cgroup Exporter for cgroup v2 metrics (slices, memory pressure, etc.)
+  services.prometheus.exporters.cgroup = {
+    enable = true;
+    port = 13232;
+    listenAddress = "127.0.0.1";
+  };
+
   # Node Exporter for system metrics
   services.prometheus.exporters.node = {
     enable = true;
@@ -19,16 +26,22 @@ in
       "systemd"
       "processes"
       "cpu"
+      "cgroups"
       "diskstats"
       "filesystem"
       "loadavg"
       "meminfo"
       "netdev"
-      "netstat"
+      # Removed netstat and vmstat to reduce memory overhead
       "stat"
       "time"
       "uname"
-      "vmstat"
+    ];
+    # Enable systemd unit metrics including memory usage
+    extraFlags = [
+      "--collector.systemd.unit-include=.+"
+      "--collector.systemd.enable-task-metrics"
+      "--collector.systemd.enable-restarts-metrics"
     ];
   };
 

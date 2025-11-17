@@ -24,6 +24,7 @@ in
     ./modules/nixlab/services/glance.nix
     ./modules/nixlab/services/romm.nix
     ./modules/nixlab/storage.nix
+    ./modules/nixlab/system-resources.nix
   ];
 
   config = {

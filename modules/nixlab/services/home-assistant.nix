@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, config, ... }:
 
 {
   services.home-assistant = {
@@ -14,6 +14,7 @@
       "cast"
       "hue"
       "sonos"
+      "plex"
       "homekit_controller"
       "ecobee"
       "isal"
@@ -34,6 +35,13 @@
       };
       zha = {
         usb_path = "/dev/ttyUSB0";
+      };
+      wemo = {
+        discovery = false;
+        static = [
+          "192.168.1.185"
+          "192.168.1.167"
+        ];
       };
     };
   };

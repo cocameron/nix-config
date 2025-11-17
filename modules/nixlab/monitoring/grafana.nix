@@ -1,30 +1,41 @@
 { config, lib, pkgs, ... }:
 
 let
-  # Automatically provision all JSON dashboards from the dashboards directory
+  # Get memory limits from system-resources module
+  memLimits = config.nixlab.memoryLimits;
+
+  # Generate system overview dashboard with memory limits
+  systemOverviewDashboard = pkgs.writeText "system-overview.json"
+    (import ./dashboards/system-overview.nix { memoryLimits = memLimits; });
+
+  # Automatically provision other JSON dashboards from the dashboards directory
   dashboardFiles = builtins.readDir ./dashboards;
-  dashboardEtc = lib.mapAttrs' (name: type:
+  otherDashboards = lib.mapAttrs' (name: type:
     lib.nameValuePair
       "grafana/provisioning/dashboards/${name}"
       { source = ./dashboards/${name}; }
-  ) (lib.filterAttrs (name: type: type == "regular" && lib.hasSuffix ".json" name) dashboardFiles);
+  ) (lib.filterAttrs (name: type:
+      type == "regular" &&
+      lib.hasSuffix ".json" name &&
+      name != "system-overview.json"
+    ) dashboardFiles);
+
+  # Combine generated and static dashboards
+  dashboardEtc = otherDashboards // {
+    "grafana/provisioning/dashboards/system-overview.json" = {
+      source = systemOverviewDashboard;
+    };
+  };
 in
 {
   # Grafana for dashboards
   services.grafana = {
     enable = true;
 
-    # Install VictoriaMetrics plugins
-    # Note: When declarativePlugins is set, Grafana tries to install built-in plugins
-    # like exploretraces, metricsdrilldown, etc., but fails due to read-only filesystem.
-    # We need to include all required plugins here.
+    # Install VictoriaMetrics plugins only
     declarativePlugins = with pkgs.grafanaPlugins; [
       victoriametrics-logs-datasource
       victoriametrics-metrics-datasource
-      grafana-exploretraces-app
-      grafana-lokiexplore-app
-      grafana-metricsdrilldown-app
-      grafana-pyroscope-app
     ];
 
     settings = {
@@ -532,6 +543,202 @@ in
               };
               labels = {
                 severity = "warning";
+              };
+            }
+            {
+              uid = "slice-memory-throttling";
+              title = "Systemd Slice Memory Throttling";
+              condition = "C";
+              data = [
+                {
+                  refId = "A";
+                  datasourceUid = "victoriametrics";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 300;
+                    to = 0;
+                  };
+                  datasource = {
+                    type = "prometheus";
+                    uid = "victoriametrics";
+                  };
+                  model = {
+                    expr = ''
+                      (sum(cgroup_memory_current_bytes{instance="nixlab",cgroup=~"network\\.slice/.*"}) / (${toString memLimits.network.max} * 1024 * 1024)) > 0.80 or
+                      (sum(cgroup_memory_current_bytes{instance="nixlab",cgroup=~"monitoring\\.slice/.*"}) / (${toString memLimits.monitoring.max} * 1024 * 1024)) > 0.80 or
+                      (sum(cgroup_memory_current_bytes{instance="nixlab",cgroup=~"media\\.slice/.*"}) / (${toString memLimits.mediaSystem.max} * 1024 * 1024)) > 0.80 or
+                      (sum(cgroup_memory_current_bytes{instance="nixlab",cgroup=~"user\\.slice/user-1000\\.slice/user@1000\\.service/media\\.slice/.*"}) / (${toString memLimits.mediaUser.max} * 1024 * 1024)) > 0.80
+                    '';
+                    refId = "A";
+                  };
+                }
+                {
+                  refId = "B";
+                  datasourceUid = "-100";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 0;
+                    to = 0;
+                  };
+                  model = {
+                    expression = "A";
+                    reducer = "max";
+                    settings = {
+                      mode = "dropNN";
+                    };
+                    type = "reduce";
+                  };
+                }
+                {
+                  refId = "C";
+                  datasourceUid = "-100";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 0;
+                    to = 0;
+                  };
+                  model = {
+                    conditions = [
+                      {
+                        evaluator = {
+                          params = [ 0 ];
+                          type = "gt";
+                        };
+                        query = {
+                          params = [ "B" ];
+                        };
+                        type = "query";
+                      }
+                    ];
+                    expression = "B";
+                    type = "threshold";
+                  };
+                }
+              ];
+              noDataState = "NoData";
+              execErrState = "Alerting";
+              for_ = "3m";
+              annotations = {
+                summary = "Systemd slice approaching MemoryMax threshold";
+                description = "A systemd slice is at {{ $value | humanizePercentage }} of its MemoryMax limit and will be throttled soon";
+              };
+              labels = {
+                severity = "warning";
+              };
+            }
+            {
+              uid = "slice-memory-critical";
+              title = "Systemd Slice Memory Critical";
+              condition = "C";
+              data = [
+                {
+                  refId = "A";
+                  datasourceUid = "victoriametrics";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 300;
+                    to = 0;
+                  };
+                  datasource = {
+                    type = "prometheus";
+                    uid = "victoriametrics";
+                  };
+                  model = {
+                    expr = ''
+                      (sum(cgroup_memory_current_bytes{instance="nixlab",cgroup=~"network\\.slice/.*"}) / (${toString memLimits.network.max} * 1024 * 1024)) > 0.90 or
+                      (sum(cgroup_memory_current_bytes{instance="nixlab",cgroup=~"monitoring\\.slice/.*"}) / (${toString memLimits.monitoring.max} * 1024 * 1024)) > 0.90 or
+                      (sum(cgroup_memory_current_bytes{instance="nixlab",cgroup=~"media\\.slice/.*"}) / (${toString memLimits.mediaSystem.max} * 1024 * 1024)) > 0.90 or
+                      (sum(cgroup_memory_current_bytes{instance="nixlab",cgroup=~"user\\.slice/user-1000\\.slice/user@1000\\.service/media\\.slice/.*"}) / (${toString memLimits.mediaUser.max} * 1024 * 1024)) > 0.90
+                    '';
+                    refId = "A";
+                  };
+                }
+                {
+                  refId = "B";
+                  datasourceUid = "-100";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 0;
+                    to = 0;
+                  };
+                  model = {
+                    expression = "A";
+                    reducer = "max";
+                    settings = {
+                      mode = "dropNN";
+                    };
+                    type = "reduce";
+                  };
+                }
+                {
+                  refId = "C";
+                  datasourceUid = "-100";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 0;
+                    to = 0;
+                  };
+                  model = {
+                    conditions = [
+                      {
+                        evaluator = {
+                          params = [ 0 ];
+                          type = "gt";
+                        };
+                        query = {
+                          params = [ "B" ];
+                        };
+                        type = "query";
+                      }
+                    ];
+                    expression = "B";
+                    type = "threshold";
+                  };
+                }
+              ];
+              noDataState = "NoData";
+              execErrState = "Alerting";
+              for_ = "2m";
+              annotations = {
+                summary = "Systemd slice near MemoryMax limit - OOM imminent";
+                description = "A systemd slice is at {{ $value | humanizePercentage }} of its MemoryMax limit. Services may be killed by systemd-oomd.";
+              };
+              labels = {
+                severity = "critical";
+              };
+            }
+            {
+              uid = "oom-kills-detected";
+              title = "OOM Kills Detected";
+              condition = "A";
+              data = [
+                {
+                  refId = "A";
+                  datasourceUid = "victoriametrics";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 300;
+                    to = 0;
+                  };
+                  datasource = {
+                    type = "prometheus";
+                    uid = "victoriametrics";
+                  };
+                  model = {
+                    expr = "sum(increase(cgroup_memory_events_oom_kill_total{instance=\"nixlab\"}[5m])) > 0";
+                    refId = "A";
+                  };
+                }
+              ];
+              noDataState = "NoData";
+              execErrState = "OK";
+              for_ = "1m";
+              annotations = {
+                summary = "OOM killer invoked on nixlab";
+                description = "{{ $value }} processes were killed by the OOM killer in the last 5 minutes. Check slice memory usage and systemd journal.";
+              };
+              labels = {
+                severity = "critical";
               };
             }
           ];

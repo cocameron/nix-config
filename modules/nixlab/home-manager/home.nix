@@ -2,11 +2,13 @@
   lib,
   config,
   nixosConfig,
+  pkgs,
   pkgs-unstable,
   ...
 }:
 let
   constants = import ../../common/constants.nix;
+  unpackerrPkg = pkgs.callPackage ../packages/unpackerr.nix {};
 in
 {
   imports = [
@@ -37,6 +39,10 @@ in
             "8388:8388/udp" # Gluetun Local Network Shadowsocks
             "8200:8200"     # qbit web ui
           ];
+          extraConfig = {
+            Service.Slice = "media.slice";
+            Service.OOMScoreAdjust = 400;
+          };
           environment = {
             WIREGUARD_MTU = 1320;
             TZ = constants.timezone;
@@ -66,6 +72,10 @@ in
             "8389:8388/tcp" # Shadowsocks (different port to avoid conflict)
             "5030:5030"     # slskd web ui
           ];
+          extraConfig = {
+            Service.Slice = "media.slice";
+            Service.OOMScoreAdjust = 400;
+          };
           environment = {
             WIREGUARD_MTU = 1320;
             TZ = constants.timezone;
@@ -89,6 +99,8 @@ in
           extraConfig = {
             Unit.Requires = "podman-gluetun-qbt.service";
             Unit.After = "podman-gluetun-qbt.service";
+            Service.Slice = "media.slice";
+            Service.OOMScoreAdjust = 500;
           };
           network = lib.mkForce [ "container:gluetun-qbt" ];
           environment = {
@@ -113,6 +125,8 @@ in
           extraConfig = {
             Unit.Requires = "podman-gluetun-slskd.service";
             Unit.After = "podman-gluetun-slskd.service";
+            Service.Slice = "media.slice";
+            Service.OOMScoreAdjust = 600;
           };
           network = lib.mkForce [ "container:gluetun-slskd" ];
           environment = {
@@ -123,8 +137,73 @@ in
             SLSKD_DOWNLOADS_DIR = "/data/slsk";
           };
         };
-        
-        
+
+        profilarr = {
+          image = "santiagosayshey/profilarr:latest";
+          extraPodmanArgs = [ "--network=host" ];
+          volumes = [
+            "/home/${constants.primaryUser}/.config/profilarr:/config"
+          ];
+          extraConfig = {
+            Service.Slice = "media.slice";
+            Service.OOMScoreAdjust = 700;
+          };
+          environment = {
+            TZ = constants.timezone;
+          };
+        };
+
+        romm-db = {
+          image = "mariadb:latest";
+          volumes = [
+            "romm-mysql-data:/var/lib/mysql"
+          ];
+          extraPodmanArgs = [
+            "--health-cmd=healthcheck.sh --connect --innodb_initialized"
+            "--health-start-period=30s"
+            "--health-interval=10s"
+            "--health-timeout=5s"
+            "--health-retries=5"
+          ];
+          extraConfig = {
+            Service.Slice = "media.slice";
+            Service.OOMScoreAdjust = 600;
+          };
+          environment = {
+            MARIADB_DATABASE = "romm";
+            MARIADB_USER = "romm-user";
+          };
+          environmentFile = [ nixosConfig.sops.templates."romm-db-env".path ];
+        };
+
+        romm = {
+          image = "rommapp/romm:latest";
+          ports = [
+            "8091:8080"
+          ];
+          volumes = [
+            "romm-resources:/romm/resources"
+            "romm-redis-data:/redis-data"
+            "/mnt/nfs/content/media/games:/romm/library"
+            "/mnt/storage/romm/assets:/romm/assets"
+            "/mnt/storage/romm/config:/romm/config"
+          ];
+          extraConfig = {
+            Unit.Requires = "podman-romm-db.service";
+            Unit.After = "podman-romm-db.service";
+            Service.Slice = "media.slice";
+            Service.OOMScoreAdjust = 600;
+          };
+          environment = {
+            DB_HOST = "romm-db";
+            DB_NAME = "romm";
+            DB_USER = "romm-user";
+            PLAYMATCH_API_ENABLED = "true";
+            HASHEOUS_API_ENABLED = "true";
+          };
+          environmentFile = [ nixosConfig.sops.templates."romm-env".path ];
+        };
+
       };
     };
     
@@ -136,7 +215,7 @@ in
       };
       Service = {
         Type = "oneshot";
-        ExecStart = "/bin/sh -c 'if [ -f /home/${constants.primaryUser}/.config/gluetun/slskd-port ]; then NEW_PORT=$(cat /home/${constants.primaryUser}/.config/gluetun/slskd-port); echo \"Updating slskd to use port $NEW_PORT\"; sed -i \"s/listen_port: [0-9]\\+/listen_port: $NEW_PORT/\" /home/${constants.primaryUser}/.config/slskd/slskd.yml && systemctl --user restart podman-slskd.service; fi'";
+        ExecStart = "${pkgs.bash}/bin/bash -c 'if [ -f /home/${constants.primaryUser}/.config/gluetun/slskd-port ]; then NEW_PORT=$(${pkgs.coreutils}/bin/cat /home/${constants.primaryUser}/.config/gluetun/slskd-port); CURRENT_PORT=$(${pkgs.gnugrep}/bin/grep -oP \"listen_port: \\K[0-9]+\" /home/${constants.primaryUser}/.config/slskd/slskd.yml || echo 0); if [ \"$NEW_PORT\" != \"$CURRENT_PORT\" ]; then echo \"Port changed from $CURRENT_PORT to $NEW_PORT, updating slskd\"; ${pkgs.gnused}/bin/sed -i \"s/listen_port: [0-9]\\+/listen_port: $NEW_PORT/\" /home/${constants.primaryUser}/.config/slskd/slskd.yml && ${pkgs.systemd}/bin/systemctl --user restart podman-slskd.service; else echo \"Port unchanged ($NEW_PORT), skipping restart\"; fi; fi'";
         RemainAfterExit = false;
       };
     };
@@ -165,9 +244,53 @@ in
         ExecStart = "${pkgs-unstable.wrtag}/bin/wrtagweb";
         Restart = "always";
         RestartSec = "10s";
+        Slice = "media.slice";
+        OOMScoreAdjust = 700;
         Environment = [
           "WRTAG_CONFIG_PATH=/home/${constants.primaryUser}/.config/wrtag/config"
         ];
+      };
+      Install = {
+        WantedBy = [ "default.target" ];
+      };
+    };
+
+    # Unpackerr - Extract downloads for *arr apps
+    systemd.user.services.unpackerr = {
+      Unit = {
+        Description = "Unpackerr extracts downloads for Radarr, Sonarr, Lidarr, and Readarr";
+        After = [ "network.target" ];
+      };
+      Service = {
+        Type = "simple";
+        ExecStart = "${unpackerrPkg.unpackerr}/bin/unpackerr -c /home/${constants.primaryUser}/.config/unpackerr/unpackerr.conf";
+        Restart = "on-failure";
+        RestartSec = "5s";
+        Slice = "media.slice";
+        OOMScoreAdjust = 800;
+        Environment = [
+          "TZ=${constants.timezone}"
+        ];
+      };
+      Install = {
+        WantedBy = [ "default.target" ];
+      };
+    };
+
+    # iSponsorBlockTV - Skip SponsorBlock segments on YouTube TV
+    systemd.user.services.isponsorblocktv = {
+      Unit = {
+        Description = "SponsorBlock client for YouTube TV";
+        After = [ "network-online.target" ];
+        Wants = [ "network-online.target" ];
+      };
+      Service = {
+        Type = "simple";
+        ExecStart = "${pkgs-unstable.isponsorblocktv}/bin/iSponsorBlockTV";
+        Restart = "on-failure";
+        RestartSec = "10s";
+        Slice = "media.slice";
+        OOMScoreAdjust = 800;
       };
       Install = {
         WantedBy = [ "default.target" ];

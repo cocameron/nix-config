@@ -17,6 +17,26 @@
         "type": "github"
       }
     },
+    "cgroup-exporter": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1752005983,
+        "narHash": "sha256-yzEWgzXI9ttPIQ56D2POkOjblBoq6ucATBvMOQHm8No=",
+        "owner": "arianvp",
+        "repo": "cgroup-exporter",
+        "rev": "443dcf85b1623eb3098139cf3ed1df6f1e51d7cb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "arianvp",
+        "repo": "cgroup-exporter",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -196,6 +216,7 @@
     },
     "root": {
       "inputs": {
+        "cgroup-exporter": "cgroup-exporter",
         "home-manager": "home-manager",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
