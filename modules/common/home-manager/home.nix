@@ -3,7 +3,6 @@
   lib,
   config,
   pkgs,
-  pkgs-unstable ? pkgs,
   ...
 }:
 let
@@ -35,6 +34,9 @@ in
           ghostscript
 	  jq
 	  flac
+	  yq-go
+	  nvd
+	  nh
         ]
         ++ config.local.machinePackages;
       sessionVariables = {
@@ -75,6 +77,12 @@ in
           vim = "nvim";
         };
         history.size = 10000;
+        initContent = ''
+          # Start in ~/code/nix-config when logging in
+          if [[ "$PWD" == "$HOME" ]]; then
+            cd ~/code/nix-config
+          fi
+        '';
       };
       starship = {
         enable = true;

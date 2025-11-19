@@ -174,7 +174,7 @@ in
             {
               uid = "memory-critical";
               title = "Memory Usage Critical";
-              condition = "A";
+              condition = "C";
               data = [
                 {
                   refId = "A";
@@ -189,8 +189,50 @@ in
                     uid = "victoriametrics";
                   };
                   model = {
-                    expr = "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90";
+                    expr = "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100";
                     refId = "A";
+                  };
+                }
+                {
+                  refId = "B";
+                  datasourceUid = "-100";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 0;
+                    to = 0;
+                  };
+                  model = {
+                    expression = "A";
+                    reducer = "last";
+                    settings = {
+                      mode = "dropNN";
+                    };
+                    type = "reduce";
+                  };
+                }
+                {
+                  refId = "C";
+                  datasourceUid = "-100";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 0;
+                    to = 0;
+                  };
+                  model = {
+                    conditions = [
+                      {
+                        evaluator = {
+                          params = [ 90 ];
+                          type = "gt";
+                        };
+                        query = {
+                          params = [ "B" ];
+                        };
+                        type = "query";
+                      }
+                    ];
+                    expression = "B";
+                    type = "threshold";
                   };
                 }
               ];
@@ -208,7 +250,7 @@ in
             {
               uid = "memory-warning";
               title = "Memory Usage Warning";
-              condition = "A";
+              condition = "C";
               data = [
                 {
                   refId = "A";
@@ -223,8 +265,50 @@ in
                     uid = "victoriametrics";
                   };
                   model = {
-                    expr = "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 80";
+                    expr = "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100";
                     refId = "A";
+                  };
+                }
+                {
+                  refId = "B";
+                  datasourceUid = "-100";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 0;
+                    to = 0;
+                  };
+                  model = {
+                    expression = "A";
+                    reducer = "last";
+                    settings = {
+                      mode = "dropNN";
+                    };
+                    type = "reduce";
+                  };
+                }
+                {
+                  refId = "C";
+                  datasourceUid = "-100";
+                  queryType = "";
+                  relativeTimeRange = {
+                    from = 0;
+                    to = 0;
+                  };
+                  model = {
+                    conditions = [
+                      {
+                        evaluator = {
+                          params = [ 80 ];
+                          type = "gt";
+                        };
+                        query = {
+                          params = [ "B" ];
+                        };
+                        type = "query";
+                      }
+                    ];
+                    expression = "B";
+                    type = "threshold";
                   };
                 }
               ];
@@ -547,7 +631,7 @@ in
             }
             {
               uid = "slice-memory-throttling";
-              title = "Systemd Slice Memory Throttling";
+              title = "Systemd Slice Memory Pressure";
               condition = "C";
               data = [
                 {
@@ -564,10 +648,10 @@ in
                   };
                   model = {
                     expr = ''
-                      (sum(cgroup_memory_current_bytes{instance="nixlab",cgroup=~"network\\.slice/.*"}) / (${toString memLimits.network.max} * 1024 * 1024)) > 0.80 or
-                      (sum(cgroup_memory_current_bytes{instance="nixlab",cgroup=~"monitoring\\.slice/.*"}) / (${toString memLimits.monitoring.max} * 1024 * 1024)) > 0.80 or
-                      (sum(cgroup_memory_current_bytes{instance="nixlab",cgroup=~"media\\.slice/.*"}) / (${toString memLimits.mediaSystem.max} * 1024 * 1024)) > 0.80 or
-                      (sum(cgroup_memory_current_bytes{instance="nixlab",cgroup=~"user\\.slice/user-1000\\.slice/user@1000\\.service/media\\.slice/.*"}) / (${toString memLimits.mediaUser.max} * 1024 * 1024)) > 0.80
+                      max(rate(cgroup_memory_pressure_some_seconds_total{instance="nixlab",cgroup=~"network\\.slice/.*"}[2m])) * 100 > 10 or
+                      max(rate(cgroup_memory_pressure_some_seconds_total{instance="nixlab",cgroup=~"monitoring\\.slice/.*"}[2m])) * 100 > 10 or
+                      max(rate(cgroup_memory_pressure_some_seconds_total{instance="nixlab",cgroup=~"media\\.slice/.*"}[2m])) * 100 > 10 or
+                      max(rate(cgroup_memory_pressure_some_seconds_total{instance="nixlab",cgroup=~"user\\.slice/user-1000\\.slice/user@1000\\.service/media\\.slice/.*"}[2m])) * 100 > 10
                     '';
                     refId = "A";
                   };
@@ -619,8 +703,8 @@ in
               execErrState = "Alerting";
               for_ = "3m";
               annotations = {
-                summary = "Systemd slice approaching MemoryMax threshold";
-                description = "A systemd slice is at {{ $value | humanizePercentage }} of its MemoryMax limit and will be throttled soon";
+                summary = "Systemd slice experiencing memory pressure";
+                description = "A systemd slice has processes stalled {{ $value }}% of the time waiting for memory. This indicates actual memory contention, not just cache usage.";
               };
               labels = {
                 severity = "warning";
@@ -628,7 +712,7 @@ in
             }
             {
               uid = "slice-memory-critical";
-              title = "Systemd Slice Memory Critical";
+              title = "Systemd Slice Memory Pressure Critical";
               condition = "C";
               data = [
                 {
@@ -645,10 +729,10 @@ in
                   };
                   model = {
                     expr = ''
-                      (sum(cgroup_memory_current_bytes{instance="nixlab",cgroup=~"network\\.slice/.*"}) / (${toString memLimits.network.max} * 1024 * 1024)) > 0.90 or
-                      (sum(cgroup_memory_current_bytes{instance="nixlab",cgroup=~"monitoring\\.slice/.*"}) / (${toString memLimits.monitoring.max} * 1024 * 1024)) > 0.90 or
-                      (sum(cgroup_memory_current_bytes{instance="nixlab",cgroup=~"media\\.slice/.*"}) / (${toString memLimits.mediaSystem.max} * 1024 * 1024)) > 0.90 or
-                      (sum(cgroup_memory_current_bytes{instance="nixlab",cgroup=~"user\\.slice/user-1000\\.slice/user@1000\\.service/media\\.slice/.*"}) / (${toString memLimits.mediaUser.max} * 1024 * 1024)) > 0.90
+                      max(rate(cgroup_memory_pressure_full_seconds_total{instance="nixlab",cgroup=~"network\\.slice/.*"}[2m])) * 100 > 5 or
+                      max(rate(cgroup_memory_pressure_full_seconds_total{instance="nixlab",cgroup=~"monitoring\\.slice/.*"}[2m])) * 100 > 5 or
+                      max(rate(cgroup_memory_pressure_full_seconds_total{instance="nixlab",cgroup=~"media\\.slice/.*"}[2m])) * 100 > 5 or
+                      max(rate(cgroup_memory_pressure_full_seconds_total{instance="nixlab",cgroup=~"user\\.slice/user-1000\\.slice/user@1000\\.service/media\\.slice/.*"}[2m])) * 100 > 5
                     '';
                     refId = "A";
                   };
@@ -700,8 +784,8 @@ in
               execErrState = "Alerting";
               for_ = "2m";
               annotations = {
-                summary = "Systemd slice near MemoryMax limit - OOM imminent";
-                description = "A systemd slice is at {{ $value | humanizePercentage }} of its MemoryMax limit. Services may be killed by systemd-oomd.";
+                summary = "Systemd slice under severe memory pressure";
+                description = "A systemd slice has ALL processes stalled {{ $value }}% of the time waiting for memory. This is severe memory contention. OOM kills may occur soon.";
               };
               labels = {
                 severity = "critical";

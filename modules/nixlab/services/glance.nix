@@ -1,8 +1,55 @@
 { lib, pkgs, ... }:
 let
+  constants = import ../../common/constants.nix;
+  reverseProxyServicesMap = import ../reverse-proxy-services.nix;
+
   qbittorrent-stats = import ./qbittorrent-stats.nix;
   proxmox = import ./proxmox-detailed-resources.nix;
   plex = import ./plex-playing.nix;
+
+  # Icon mapping for services
+  serviceIcons = {
+    ha = "si:homeassistant";
+    grafana = "si:grafana";
+    plex = "si:plex";
+    qbittorrent = "si:qbittorrent";
+    radarr = "si:radarr";
+    sonarr = "si:sonarr";
+    prowlarr = "si:prowlarr";
+    lidarr = "si:lidarr";
+    profilarr = "si:sonarr";
+    proxmox = "si:proxmox";
+  };
+
+  # Services that need special check URLs
+  serviceCheckUrls = {
+    plex = "http://localhost:32400/web";
+    slskd = "http://127.0.0.1:5030/health";
+  };
+
+  # Services that use 127.0.0.1 instead of localhost
+  ipv4OnlyServices = [ "slskd" "qbittorrent" "romm" ];
+
+  # Generate monitor sites from the reverse proxy services map
+  generateMonitorSites = lib.mapAttrsToList (name: value:
+    let
+      # Use custom host if provided, otherwise use localhost/127.0.0.1
+      host = if value ? host then value.host
+             else if builtins.elem name ipv4OnlyServices then "127.0.0.1"
+             else "localhost";
+
+      # Use custom scheme if provided
+      scheme = if value ? scheme then value.scheme else "http";
+
+      # Check if there's a custom check URL, otherwise build from host/scheme/port
+      checkUrl = serviceCheckUrls.${name} or "${scheme}://${host}:${toString value.port}";
+    in
+    {
+      title = value.friendlyName;
+      url = "https://${name}.${constants.domain.nixlab}";
+      check-url = checkUrl;
+    } // (if serviceIcons ? ${name} then { icon = serviceIcons.${name}; } else {})
+  ) reverseProxyServicesMap;
 in
 {
   services.glance = {
@@ -27,71 +74,7 @@ in
                   title = "Services";
 		  hide-header = true;
                   style = "compact";
-                  sites = [
-                    {
-                      title = "Home Assistant";
-                      url = "https://ha.nixlab.brucebrus.org";
-                      check-url = "http://localhost:8123";
-                      icon = "si:homeassistant";
-                    }
-                    {
-                      title = "Grafana";
-                      url = "https://grafana.nixlab.brucebrus.org";
-                      check-url = "http://localhost:3000";
-                      icon = "si:grafana";
-                    }
-                    {
-                      title = "Plex";
-                      url = "https://plex.nixlab.brucebrus.org";
-                      check-url = "http://localhost:32400/web";
-                      icon = "si:plex";
-                    }
-                    {
-                      title = "qBittorrent";
-                      url = "https://qbittorrent.nixlab.brucebrus.org";
-                      check-url = "http://localhost:8200";
-                      icon = "si:qbittorrent";
-                    }
-                    {
-                      title = "Radarr";
-                      url = "https://radarr.nixlab.brucebrus.org";
-                      check-url = "http://localhost:7878";
-                      icon = "si:radarr";
-                    }
-                    {
-                      title = "Sonarr";
-                      url = "https://sonarr.nixlab.brucebrus.org";
-                      check-url = "http://localhost:8989";
-                      icon = "si:sonarr";
-                    }
-                    {
-                      title = "Prowlarr";
-                      url = "https://prowlarr.nixlab.brucebrus.org";
-                      check-url = "http://localhost:9696";
-                      icon = "si:prowlarr";
-                    }
-                    {
-                      title = "Lidarr";
-                      url = "https://lidarr.nixlab.brucebrus.org";
-                      check-url = "http://localhost:8686";
-                      icon = "si:lidarr";
-                    }
-                    {
-                      title = "Slskd";
-                      url = "https://slskd.nixlab.brucebrus.org";
-                      check-url = "http://127.0.0.1:5030/health";
-                    }
-                    {
-                      title = "Profilarr";
-                      url = "https://profilarr.nixlab.brucebrus.org";
-                      check-url = "http://localhost:6868";
-                      icon = "si:sonarr";
-                    }
-                    {
-                      title = "wrtagweb";
-                      url = "https://wrtagweb.nixlab.brucebrus.org";
-                    }
-                  ];
+                  sites = generateMonitorSites;
                 }
                 qbittorrent-stats
 		proxmox

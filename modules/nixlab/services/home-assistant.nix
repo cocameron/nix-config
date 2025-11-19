@@ -8,6 +8,7 @@
       "esphome"
       "met"
       "radio_browser"
+      "simplisafe"
       "spotify"
       "apple_tv"
       "google_translate"

@@ -16,9 +16,15 @@
   ];
 
   config = {
-    hardware.nvidia.prime = {
-      amdgpuBusId = "PCI:12:0:0";
-      nvidiaBusId = "PCI:1:0:0";
+    hardware.nvidia = {
+      prime = {
+        amdgpuBusId = "PCI:12:0:0";
+        nvidiaBusId = "PCI:1:0:0";
+      };
+      # Disable power management for better gaming performance
+      powerManagement.enable = false;
+      # Disable force full composition pipeline for better gaming performance
+      forceFullCompositionPipeline = false;
     };
     hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 

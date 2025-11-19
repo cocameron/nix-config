@@ -2,7 +2,6 @@
   config,
   inputs,
   pkgs,
-  pkgs-unstable,
   modulesPath,
   lib,
   ...
@@ -30,6 +29,7 @@ in
   config = {
     # Hostname
     networking.hostName = "nixlab";
+    nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
     # GPG agent
     programs.gnupg.agent = {
@@ -136,6 +136,8 @@ in
         '';
       };
       templates."romm-env" = {
+        owner = constants.primaryUser;
+        mode = "0400";
         content = ''
           DB_PASSWD=${config.sops.placeholder."romm_db_password"}
           ROMM_AUTH_SECRET_KEY=${config.sops.placeholder."romm_auth_secret_key"}
@@ -144,6 +146,8 @@ in
         '';
       };
       templates."romm-db-env" = {
+        owner = constants.primaryUser;
+        mode = "0400";
         content = ''
           MARIADB_ROOT_PASSWORD=${config.sops.placeholder."romm_db_root_password"}
           MARIADB_PASSWORD=${config.sops.placeholder."romm_db_password"}
@@ -181,7 +185,7 @@ in
       extraSpecialArgs = {
         machinePackages = with pkgs; [ _1password-cli ];
         nixosConfig = config;
-        inherit inputs pkgs-unstable;
+        inherit inputs;
       };
     };
 

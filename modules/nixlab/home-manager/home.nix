@@ -3,7 +3,6 @@
   config,
   nixosConfig,
   pkgs,
-  pkgs-unstable,
   ...
 }:
 let
@@ -16,12 +15,17 @@ in
   ];
   config = {
     home.packages = [
-      pkgs-unstable.claude-code
-      pkgs-unstable.wrtag
-      pkgs-unstable.essentia-extractor
+      pkgs.claude-code
+      pkgs.wrtag
+      pkgs.essentia-extractor
     ];
     services.podman = {
       enable = true;
+      networks = {
+        romm-network = {
+          driver = "bridge";
+        };
+      };
       containers = {
         # First gluetun instance for qBittorrent
         gluetun-qbt = {
@@ -155,11 +159,12 @@ in
 
         romm-db = {
           image = "mariadb:latest";
+          network = [ "romm-network" ];
           volumes = [
             "romm-mysql-data:/var/lib/mysql"
           ];
           extraPodmanArgs = [
-            "--health-cmd=healthcheck.sh --connect --innodb_initialized"
+            "--health-cmd=\"healthcheck.sh --connect --innodb_initialized\""
             "--health-start-period=30s"
             "--health-interval=10s"
             "--health-timeout=5s"
@@ -178,6 +183,7 @@ in
 
         romm = {
           image = "rommapp/romm:latest";
+          network = [ "romm-network" ];
           ports = [
             "8091:8080"
           ];
@@ -241,7 +247,7 @@ in
       };
       Service = {
         Type = "simple";
-        ExecStart = "${pkgs-unstable.wrtag}/bin/wrtagweb";
+        ExecStart = "${pkgs.wrtag}/bin/wrtagweb";
         Restart = "always";
         RestartSec = "10s";
         Slice = "media.slice";
@@ -286,7 +292,7 @@ in
       };
       Service = {
         Type = "simple";
-        ExecStart = "${pkgs-unstable.isponsorblocktv}/bin/iSponsorBlockTV";
+        ExecStart = "${pkgs.isponsorblocktv}/bin/iSponsorBlockTV";
         Restart = "on-failure";
         RestartSec = "10s";
         Slice = "media.slice";

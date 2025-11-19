@@ -4,7 +4,6 @@
   pkgs,
   modulesPath,
   lib,
-  pkgs-unstable,
   ...
 }:
 let
@@ -41,7 +40,7 @@ in
       extraSpecialArgs = {
         machinePackages = [ ];
         nixosConfig = config;
-        inherit inputs pkgs-unstable;
+        inherit inputs;
       };
     };
 

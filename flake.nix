@@ -49,13 +49,6 @@
 
       ...
     }@inputs:
-    let
-      # Define pkgs-unstable once for Linux systems
-      pkgs-unstable-linux = import inputs.nixpkgs {
-        system = "x86_64-linux";
-        config.allowUnfree = true;
-      };
-    in
     {
       formatter = {
         aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixfmt-rfc-style;
@@ -72,33 +65,25 @@
       nixosConfigurations = {
         nixos-wsl = nixpkgs.lib.nixosSystem {
           specialArgs = { inherit inputs; };
-          system = "x86_64-linux";
           modules = [
+            { nixpkgs.hostPlatform = "x86_64-linux"; }
             ./nixos-wsl-config.nix
           ];
         };
 
         nixlab = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs;
-            # Use the centrally defined unstable packages
-            pkgs-unstable = pkgs-unstable-linux;
-          };
-          system = "x86_64-linux";
+          specialArgs = { inherit inputs; };
           modules = [
+            { nixpkgs.hostPlatform = "x86_64-linux"; }
             ./nixlab-config.nix
             inputs.cgroup-exporter.nixosModules.default
           ];
         };
 
         greenix = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs;
-            # Use the centrally defined unstable packages
-            pkgs-unstable = pkgs-unstable-linux;
-          };
-          system = "x86_64-linux";
+          specialArgs = { inherit inputs; };
           modules = [
+            { nixpkgs.hostPlatform = "x86_64-linux"; }
             ./greenix-config.nix
           ];
         };

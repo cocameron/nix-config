@@ -1,36 +1,47 @@
-{ config, pkgs-unstable, lib, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   constants = import ../../common/constants.nix;
-  # Map of service names to their ports
-  reverseProxyServices = {
-    plex = 32400;
-    qbittorrent = 8200;
-    radarr = 7878;
-    prowlarr = 9696;
-    sonarr = 8989;
-    lidarr = 8686;
-    ha = 8123;
-    slskd = 5030;
-    grafana = 3000;
-    profilarr = 6868;
-    glance = 8080;
-    wrtagweb = 5031;
-    romm = 8091;
-  };
+  # Import shared reverse proxy service definitions
+  reverseProxyServicesMap = import ../reverse-proxy-services.nix;
 
   # Services that only support IPv4 (typically containerized services)
   ipv4OnlyServices = [ "slskd" "qbittorrent" "romm" ];
 
   # Helper function to create reverse proxy virtual hosts
-  mkVirtualHost = name: port: {
-    name = "${name}.${constants.domain.nixlab}";
-    value = {
-      extraConfig = ''
-        reverse_proxy ${if builtins.elem name ipv4OnlyServices then "127.0.0.1" else "localhost"}:${toString port}
-      '';
+  mkVirtualHost = name: config:
+    let
+      # Determine the host - use custom host if provided, otherwise localhost/127.0.0.1
+      host = if config ? host then config.host
+             else if builtins.elem name ipv4OnlyServices then "127.0.0.1"
+             else "localhost";
+
+      # Determine scheme (http or https)
+      scheme = if config ? scheme then config.scheme else "http";
+
+      # Port
+      port = config.port;
+
+      # Build the upstream URL
+      upstream = "${scheme}://${host}:${toString port}";
+
+      # Additional Caddy config for HTTPS upstreams
+      transportConfig = if scheme == "https" then ''
+        transport http {
+          tls_insecure_skip_verify
+        }
+      '' else "";
+    in
+    {
+      name = "${name}.${constants.domain.nixlab}";
+      value = {
+        extraConfig = ''
+          reverse_proxy ${upstream} {
+            ${transportConfig}
+          }
+        '';
+      };
     };
-  };
 in
 
 {
@@ -68,14 +79,14 @@ in
         }
         redir https://glance.${constants.domain.nixlab}{uri} permanent
       '';
-    } // (builtins.listToAttrs (lib.mapAttrsToList mkVirtualHost reverseProxyServices));
+    } // (builtins.listToAttrs (lib.mapAttrsToList mkVirtualHost reverseProxyServicesMap));
 
-    package = pkgs-unstable.caddy.withPlugins {
+    package = pkgs.caddy.withPlugins {
       plugins = [
         "github.com/lucaslorentz/caddy-docker-proxy/v2@v2.10.0"
         "github.com/caddy-dns/cloudflare@v0.2.2"
       ];
-      hash = "sha256-GH7fG4eV+fnQ3hPhX2tvXoZPQUyS71Bbjg2WiIJQcSs=";
+      hash = "sha256-7hWFr7GlJaY1J94ZGy732prEDLFNTpNEZHlfaVIGQSY=";
     };
   };
 
