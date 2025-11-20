@@ -32,6 +32,7 @@ in
     discord
     raycast
     pinentry_mac
+    zed-editor
   ];
 
   home-manager = {

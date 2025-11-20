@@ -15,7 +15,6 @@ in
   ];
   config = {
     home.packages = [
-      pkgs.claude-code
       pkgs.wrtag
       pkgs.essentia-extractor
     ];
