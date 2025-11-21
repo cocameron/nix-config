@@ -1,8 +1,12 @@
-{ lib, config, ... }:
+{ lib, config, pkgs, ... }:
 
 {
   services.home-assistant = {
     enable = true;
+
+    customComponents = [
+      pkgs.home-assistant-custom-components.emporia_vue
+    ];
 
     extraComponents = [
       "esphome"
