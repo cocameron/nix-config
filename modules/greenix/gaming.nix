@@ -3,11 +3,9 @@
   config = {
     environment.systemPackages = with pkgs; [
       lutris
-      (retroarch.override {
-        cores = with libretro; [
-          dolphin
-        ];
-      })
+      (retroarch.withCores (cores: with cores; [
+        dolphin
+      ]))
       boilr
       mangohud # In-game FPS/performance overlay
       goverlay # GUI for MangoHud configuration

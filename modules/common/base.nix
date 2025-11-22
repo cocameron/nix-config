@@ -23,6 +23,7 @@ in
       };
     settings = {
       experimental-features = "nix-command flakes";
+      trusted-users = [ "root" constants.primaryUser ];
     };
     optimise = {
       automatic = true;
