@@ -1,6 +1,19 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
+let
+  sddmTheme = pkgs.stdenv.mkDerivation {
+    name = "sddm-session-grid-theme";
+    src = ./sddm-session-grid-theme;
+    installPhase = ''
+      mkdir -p $out/share/sddm/themes/session-grid
+      cp -r * $out/share/sddm/themes/session-grid/
+    '';
+  };
+in
 {
   config = {
+    # Resolve conflict between GNOME and KDE SSH askPassword
+    programs.ssh.askPassword = lib.mkForce "${pkgs.kdePackages.ksshaskpass}/bin/ksshaskpass";
+
     # Select internationalisation properties. (time.timeZone is in base.nix)
     i18n.defaultLocale = "en_US.UTF-8";
     i18n.extraLocaleSettings = {
@@ -17,29 +30,102 @@
 
     # Enable the X11 windowing system.
     services.xserver.enable = true;
+
+    # Force 120Hz refresh rate for 4K display
+    # Note: This only applies to X11 sessions, not Wayland
+    services.xserver.screenSection = ''
+      Option "metamodes" "HDMI-0: 3840x2160_120 +0+0"
+    '';
+
+    # Use SDDM for better controller support and session selection
+    services.displayManager.sddm = {
+      enable = true;
+      wayland.enable = true;
+      autoNumlock = true;
+      # Custom session-focused theme
+      theme = "session-grid";
+      # Enable controller/gamepad navigation in SDDM
+      settings = {
+        General = {
+          InputMethod = "";
+          # Don't remember last session - force session selection each time
+          RememberSession = "false";
+        };
+        Theme = {
+          Current = "session-grid";
+          CursorTheme = "breeze_cursors";
+        };
+        Users = {
+          # Remember last user but not session
+          RememberLastUser = "true";
+        };
+      };
+    };
+
+    # Clear SDDM QML cache when theme changes
+    # The cache is stored in a Nix-managed directory linked to the theme derivation
+    # When the theme changes, Nix creates a new path, automatically invalidating old cache
+    environment.etc."sddm-theme-marker".source = pkgs.writeText "sddm-theme-version" sddmTheme.outPath;
+
+    # Clear cache before starting SDDM, but only if theme marker changed
+    systemd.services.display-manager.preStart = ''
+      # If the theme marker changed, clear the cache
+      if [ -f /var/lib/sddm/.theme-marker ]; then
+        if ! cmp -s /etc/sddm-theme-marker /var/lib/sddm/.theme-marker; then
+          echo "SDDM theme changed ($(cat /etc/sddm-theme-marker)), clearing QML cache..."
+          rm -rf /var/lib/sddm/.cache/sddm-greeter-qt6
+          cp /etc/sddm-theme-marker /var/lib/sddm/.theme-marker
+        fi
+      else
+        echo "First run, clearing SDDM QML cache..."
+        mkdir -p /var/lib/sddm
+        rm -rf /var/lib/sddm/.cache/sddm-greeter-qt6
+        cp /etc/sddm-theme-marker /var/lib/sddm/.theme-marker
+      fi
+    '';
+
     # Enable the GNOME Desktop Environment.
-    services.xserver.displayManager.gdm.enable = true;
-    services.xserver.desktopManager.gnome.enable = true;
+    services.desktopManager.gnome.enable = true;
+
+    # Enable KDE Plasma as an alternative desktop environment
+    services.desktopManager.plasma6.enable = true;
+
+    # Enable niri as an alternative compositor
+    programs.niri.enable = true;
     # Configure keymap in X11
     services.xserver.xkb = {
       layout = "us";
       variant = "";
     };
-    # DPI and Scaling - moved from hardware config
-    services.xserver.dpi = 180;
+    # DPI and Scaling - for 65" 4K TV viewing
+    # Using 144 DPI (1.5x) for balanced scaling across all apps
+    services.xserver.dpi = 144;
     environment.variables = {
-      GDK_SCALE = "2";
-      GDK_DPI_SCALE = "0.5";
-      _JAVA_OPTIONS = "-Dsun.java2d.uiScale=2";
+      # Cursor size for TV (scaled for 1.5x)
+      XCURSOR_SIZE = "48";
+      # Java apps scaling
+      _JAVA_OPTIONS = "-Dsun.java2d.uiScale=1.5";
     };
+    # Note: Per-toolkit scaling (QT, GTK) is set in home-manager for per-user control
 
-    # Enable automatic login for the user.
-    services.displayManager.autoLogin.enable = true;
-    services.displayManager.autoLogin.user = "colin";
+    # Disable automatic login - user will see login screen
+    # services.displayManager.autoLogin.enable = true;
+    # services.displayManager.autoLogin.user = "colin";
 
-    # Workaround for GNOME autologin: https://github.com/NixOS/nixpkgs/issues/103746#issuecomment-945091229
-    systemd.services."getty@tty1".enable = false;
-    systemd.services."autovt@tty1".enable = false;
+    # Allow passwordless login via SDDM
+    security.pam.services.sddm.allowNullPassword = true;
+
+    # Allow passwordless login via polkit for the user
+    security.polkit.enable = true;
+    security.polkit.extraConfig = ''
+      polkit.addRule(function(action, subject) {
+          if (subject.user == "colin") {
+              return polkit.Result.YES;
+          }
+      });
+    '';
+
+    systemd.user.services.orca.enable = false;
 
     # Install firefox.
     programs.firefox.enable = true;
@@ -55,6 +141,17 @@
       xsettingsd
       xorg.xrdb
       ulauncher
+      # KDE utilities
+      kdePackages.kate  # Text editor
+      kdePackages.konsole  # Terminal
+      everforest-gtk-theme
+      kdePackages.sddm-kcm
+
+      # TV-friendly additions
+      antimicrox  # Map gamepad to keyboard/mouse for navigation
+    ] ++ [
+      # Custom SDDM theme
+      sddmTheme
     ];
 
     # Enable CUPS to print documents (moved from services.nix)

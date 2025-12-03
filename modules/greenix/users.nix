@@ -8,18 +8,6 @@ _: {
 
     # programs.zsh.enable = true; # Moved to common/base.nix
 
-    home-manager = {
-      useGlobalPkgs = true;
-      useUserPackages = true;
-      users.colin = { ... }: {
-        imports = [
-          ../common/home-manager/home.nix
-          ./home-manager
-        ];
-      };
-      extraSpecialArgs = {
-        machinePackages = [ ];
-      };
-    };
+    # Home-manager configuration moved to greenix-config.nix to avoid duplication
   };
 }

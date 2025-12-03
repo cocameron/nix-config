@@ -21,22 +21,50 @@ in
     ./modules/greenix/desktop.nix
     ./modules/greenix/gaming.nix
     ./modules/greenix/hardware.nix
+    ./modules/greenix/jovian.nix
     ./modules/greenix/packages.nix
     ./modules/greenix/users.nix
 
     # Home Manager integration
     inputs.home-manager.nixosModules.default
+    # Secrets management
+    inputs.sops-nix.nixosModules.default
+    # Jovian NixOS for gaming optimizations
+    inputs.jovian.nixosModules.jovian
   ];
 
   config = {
     # Hostname
     networking.hostName = "greenix";
+    networking.interfaces.enp9s0.wakeOnLan.enable = true;
+    
 
+    # Secrets management
+    sops = {
+      defaultSopsFile = "/var/lib/sops-nix/secrets.yaml";
+      validateSopsFiles = false;
+      age = {
+        keyFile = "/var/lib/sops-nix/keys.txt";
+      };
+      secrets.colin-password = {
+        neededForUsers = true;
+      };
+    };
+
+    services.gnome.gcr-ssh-agent.enable = true;
+    fonts.packages = with pkgs; [
+      nerd-fonts.iosevka-term-slab
+      nerd-fonts.noto
+      nerd-fonts.symbols-only
+    ];
     # Home Manager configuration
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
-      users.${constants.primaryUser}.imports = [ ./modules/greenix/home-manager/default.nix ];
+      users.${constants.primaryUser}.imports = [
+        ./modules/greenix/home-manager/default.nix
+        inputs.plasma-manager.homeModules.plasma-manager
+      ];
       extraSpecialArgs = {
         machinePackages = [ ];
         nixosConfig = config;

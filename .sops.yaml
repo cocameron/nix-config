@@ -2,6 +2,11 @@ keys:
   - &colin age1kk4gndxheafrh4q80k7qwtxfst773c2gpc9ldpez0camttd6mu3suwu0w3
   - &nixlab age1ml0zqfqdvcu4w4cytr74qlrf6fwmx25kyvtf376yv5yqr2j249rqg40aks
 creation_rules:
+  - path_regex: secrets/.*\.yaml$
+    key_groups:
+    - age:
+      - *colin
+      - *nixlab
   - path_regex: /var/lib/sops-nix/[^/]+\.(yaml|json|env|ini)$
     key_groups:
     - age:

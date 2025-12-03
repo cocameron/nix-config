@@ -1,0 +1,15 @@
+[SddmGreeterTheme]
+Name=Session Grid
+Description=SDDM theme with focus on session selection via grid layout
+Author=Colin
+Copyright=(c) 2025
+License=MIT
+Type=sddm-theme
+Version=1.0
+Website=
+MainScript=Main.qml
+ConfigFile=theme.conf
+Screenshot=screenshot.png
+Theme-Id=session-grid
+Theme-API=2.0
+QtVersion=6

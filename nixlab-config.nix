@@ -36,6 +36,10 @@ in
       enable = true;
     };
 
+
+    programs.ssh.startAgent = true;
+    
+
     # Podman for containers
     virtualisation.podman = {
       enable = true;
@@ -169,13 +173,6 @@ in
       "@wheel"
     ];
 
-    # SSH configuration
-    services.openssh = {
-      enable = true;
-      settings.PasswordAuthentication = false;
-      settings.KbdInteractiveAuthentication = false;
-    };
-    programs.ssh.startAgent = true;
 
     # Home Manager configuration
     home-manager = {
