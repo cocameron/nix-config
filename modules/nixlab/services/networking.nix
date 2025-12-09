@@ -7,8 +7,8 @@
 
 let
   constants = import ../../common/constants.nix;
-  # Import shared reverse proxy service definitions
-  reverseProxyServicesMap = import ../reverse-proxy-services.nix;
+  # Use shared reverse proxy service definitions from config
+  reverseProxyServicesMap = config.nixlab.reverseProxyServices;
 
   # Services that only support IPv4 (typically containerized services)
   ipv4OnlyServices = [

@@ -1,7 +1,7 @@
-{ lib, pkgs, ... }:
+{ lib, pkgs, config, ... }:
 let
   constants = import ../../common/constants.nix;
-  reverseProxyServicesMap = import ../reverse-proxy-services.nix;
+  reverseProxyServicesMap = config.nixlab.reverseProxyServices;
 
   qbittorrent-stats = import ./qbittorrent-stats.nix;
   proxmox = import ./proxmox-detailed-resources.nix;

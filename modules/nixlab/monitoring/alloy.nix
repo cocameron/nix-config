@@ -1,8 +1,8 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, config, ... }:
 
 let
-  # Import shared reverse proxy service definitions
-  reverseProxyServicesMap = import ../reverse-proxy-services.nix;
+  # Use shared reverse proxy service definitions from config
+  reverseProxyServicesMap = config.nixlab.reverseProxyServices;
 
   # Generate relabel rules from the service map
   generateRelabelRules = lib.concatStringsSep "\n" (
