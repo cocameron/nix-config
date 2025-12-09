@@ -13,6 +13,53 @@ Rectangle {
     property int selectedSessionIndex: sessionModel.lastIndex
     property string userName: userModel.lastUser
 
+    // Auto-select configuration
+    property int autoSelectTimeout: 7000  // 7 seconds in milliseconds
+    property string autoSelectSessionName: "gamescope"  // Session to auto-select
+    property real autoSelectStartTime: 0
+
+    // Find the gaming session index
+    function findGamingSessionIndex() {
+        for (var i = 0; i < sessionModel.rowCount(); i++) {
+            var sessionName = sessionModel.data(sessionModel.index(i, 0), 257).toLowerCase()  // Qt.DisplayRole = 257
+            if (sessionName.includes("gamescope") || sessionName.includes("steam") || sessionName.includes("jovian")) {
+                return i
+            }
+        }
+        return selectedSessionIndex  // Fallback to last used session
+    }
+
+    // Auto-select timer
+    Timer {
+        id: autoSelectTimer
+        interval: autoSelectTimeout
+        running: true
+        repeat: false
+        onTriggered: {
+            var gamingIndex = findGamingSessionIndex()
+            console.log("Auto-selecting gaming session at index:", gamingIndex)
+            sddm.login(userName, "", gamingIndex)
+        }
+        onRunningChanged: {
+            if (running) {
+                autoSelectStartTime = Date.now()
+            }
+        }
+    }
+
+    // Reset timer on any interaction
+    MouseArea {
+        anchors.fill: parent
+        propagateComposedEvents: true
+        onPressed: {
+            autoSelectTimer.restart()
+            mouse.accepted = false
+        }
+        onPositionChanged: {
+            autoSelectTimer.restart()
+        }
+    }
+
     // Main content
     ColumnLayout {
         anchors.centerIn: parent
@@ -146,6 +193,7 @@ Rectangle {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
+                            autoSelectTimer.stop()
                             sessionGrid.currentIndex = index
                             selectedSessionIndex = index
                             // Auto-login with empty password
@@ -156,23 +204,66 @@ Rectangle {
             }
 
             // Keyboard navigation
-            Keys.onLeftPressed: moveCurrentIndexLeft()
-            Keys.onRightPressed: moveCurrentIndexRight()
-            Keys.onUpPressed: moveCurrentIndexUp()
-            Keys.onDownPressed: moveCurrentIndexDown()
+            Keys.onLeftPressed: {
+                autoSelectTimer.restart()
+                moveCurrentIndexLeft()
+            }
+            Keys.onRightPressed: {
+                autoSelectTimer.restart()
+                moveCurrentIndexRight()
+            }
+            Keys.onUpPressed: {
+                autoSelectTimer.restart()
+                moveCurrentIndexUp()
+            }
+            Keys.onDownPressed: {
+                autoSelectTimer.restart()
+                moveCurrentIndexDown()
+            }
             Keys.onReturnPressed: {
+                autoSelectTimer.stop()
                 selectedSessionIndex = currentIndex
                 // Auto-login with empty password
                 sddm.login(userName, "", currentIndex)
             }
+            Keys.onPressed: {
+                // Reset timer on any key press
+                autoSelectTimer.restart()
+            }
         }
 
-        // Instructions
-        Text {
+        // Instructions and countdown
+        ColumnLayout {
             Layout.alignment: Qt.AlignHCenter
-            text: "Use arrow keys or controller to navigate • Enter or click to login"
-            font.pixelSize: 16
-            color: "#6c7086"
+            spacing: 10
+
+            Text {
+                Layout.alignment: Qt.AlignHCenter
+                text: "Use arrow keys or click to select • Press any key to cancel auto-select"
+                font.pixelSize: 16
+                color: "#6c7086"
+            }
+
+            Text {
+                id: countdownText
+                Layout.alignment: Qt.AlignHCenter
+                text: "Auto-selecting gaming mode in " + Math.ceil(autoSelectTimer.interval / 1000) + "s..."
+                font.pixelSize: 14
+                color: "#89b4fa"
+                visible: autoSelectTimer.running
+
+                Timer {
+                    interval: 100
+                    running: autoSelectTimer.running
+                    repeat: true
+                    onTriggered: {
+                        var remaining = autoSelectTimer.interval - (Date.now() - autoSelectStartTime)
+                        if (remaining > 0) {
+                            countdownText.text = "Auto-selecting gaming mode in " + Math.ceil(remaining / 1000) + "s..."
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -228,5 +319,6 @@ Rectangle {
 
     Component.onCompleted: {
         sessionGrid.forceActiveFocus()
+        autoSelectStartTime = Date.now()
     }
 }
