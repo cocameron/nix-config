@@ -13,7 +13,10 @@ builtins.toJSON {
   id = null;
   uid = "ab45f308-4dd8-4010-908c-77a58080ca71";
   title = "Nixlab System Overview";
-  tags = ["system" "nixlab"];
+  tags = [
+    "system"
+    "nixlab"
+  ];
   timezone = "browser";
   refresh = "30s";
   time = {
@@ -37,7 +40,12 @@ builtins.toJSON {
           datasource = "VictoriaMetrics";
         }
       ];
-      gridPos = { h = 4; w = 6; x = 0; y = 0; };
+      gridPos = {
+        h = 4;
+        w = 6;
+        x = 0;
+        y = 0;
+      };
       fieldConfig = {
         defaults = {
           unit = "percent";
@@ -51,11 +59,28 @@ builtins.toJSON {
         };
         overrides = [
           {
-            matcher = { id = "byName"; options = "Alert Threshold (80%)"; };
+            matcher = {
+              id = "byName";
+              options = "Alert Threshold (80%)";
+            };
             properties = [
-              { id = "custom.lineStyle"; value = { fill = "dash"; }; }
-              { id = "custom.lineWidth"; value = 2; }
-              { id = "color"; value = { mode = "fixed"; fixedColor = "red"; }; }
+              {
+                id = "custom.lineStyle";
+                value = {
+                  fill = "dash";
+                };
+              }
+              {
+                id = "custom.lineWidth";
+                value = 2;
+              }
+              {
+                id = "color";
+                value = {
+                  mode = "fixed";
+                  fixedColor = "red";
+                };
+              }
             ];
           }
         ];
@@ -89,7 +114,12 @@ builtins.toJSON {
           datasource = "VictoriaMetrics";
         }
       ];
-      gridPos = { h = 4; w = 6; x = 6; y = 0; };
+      gridPos = {
+        h = 4;
+        w = 6;
+        x = 6;
+        y = 0;
+      };
       fieldConfig = {
         defaults = {
           unit = "percent";
@@ -103,19 +133,53 @@ builtins.toJSON {
         };
         overrides = [
           {
-            matcher = { id = "byName"; options = "Warning Threshold (80%)"; };
+            matcher = {
+              id = "byName";
+              options = "Warning Threshold (80%)";
+            };
             properties = [
-              { id = "custom.lineStyle"; value = { fill = "dash"; }; }
-              { id = "custom.lineWidth"; value = 2; }
-              { id = "color"; value = { mode = "fixed"; fixedColor = "yellow"; }; }
+              {
+                id = "custom.lineStyle";
+                value = {
+                  fill = "dash";
+                };
+              }
+              {
+                id = "custom.lineWidth";
+                value = 2;
+              }
+              {
+                id = "color";
+                value = {
+                  mode = "fixed";
+                  fixedColor = "yellow";
+                };
+              }
             ];
           }
           {
-            matcher = { id = "byName"; options = "Critical Threshold (90%)"; };
+            matcher = {
+              id = "byName";
+              options = "Critical Threshold (90%)";
+            };
             properties = [
-              { id = "custom.lineStyle"; value = { fill = "dash"; }; }
-              { id = "custom.lineWidth"; value = 2; }
-              { id = "color"; value = { mode = "fixed"; fixedColor = "red"; }; }
+              {
+                id = "custom.lineStyle";
+                value = {
+                  fill = "dash";
+                };
+              }
+              {
+                id = "custom.lineWidth";
+                value = 2;
+              }
+              {
+                id = "color";
+                value = {
+                  mode = "fixed";
+                  fixedColor = "red";
+                };
+              }
             ];
           }
         ];
@@ -144,7 +208,12 @@ builtins.toJSON {
           datasource = "VictoriaMetrics";
         }
       ];
-      gridPos = { h = 4; w = 6; x = 12; y = 0; };
+      gridPos = {
+        h = 4;
+        w = 6;
+        x = 12;
+        y = 0;
+      };
       fieldConfig = {
         defaults = {
           unit = "percent";
@@ -158,11 +227,28 @@ builtins.toJSON {
         };
         overrides = [
           {
-            matcher = { id = "byName"; options = "Critical Threshold (90%)"; };
+            matcher = {
+              id = "byName";
+              options = "Critical Threshold (90%)";
+            };
             properties = [
-              { id = "custom.lineStyle"; value = { fill = "dash"; }; }
-              { id = "custom.lineWidth"; value = 2; }
-              { id = "color"; value = { mode = "fixed"; fixedColor = "red"; }; }
+              {
+                id = "custom.lineStyle";
+                value = {
+                  fill = "dash";
+                };
+              }
+              {
+                id = "custom.lineWidth";
+                value = 2;
+              }
+              {
+                id = "color";
+                value = {
+                  mode = "fixed";
+                  fixedColor = "red";
+                };
+              }
             ];
           }
         ];
@@ -191,7 +277,12 @@ builtins.toJSON {
           datasource = "VictoriaMetrics";
         }
       ];
-      gridPos = { h = 4; w = 6; x = 18; y = 0; };
+      gridPos = {
+        h = 4;
+        w = 6;
+        x = 18;
+        y = 0;
+      };
       fieldConfig = {
         defaults = {
           unit = "short";
@@ -205,11 +296,28 @@ builtins.toJSON {
         };
         overrides = [
           {
-            matcher = { id = "byName"; options = "Alert Threshold (2x CPUs)"; };
+            matcher = {
+              id = "byName";
+              options = "Alert Threshold (2x CPUs)";
+            };
             properties = [
-              { id = "custom.lineStyle"; value = { fill = "dash"; }; }
-              { id = "custom.lineWidth"; value = 2; }
-              { id = "color"; value = { mode = "fixed"; fixedColor = "red"; }; }
+              {
+                id = "custom.lineStyle";
+                value = {
+                  fill = "dash";
+                };
+              }
+              {
+                id = "custom.lineWidth";
+                value = 2;
+              }
+              {
+                id = "color";
+                value = {
+                  mode = "fixed";
+                  fixedColor = "red";
+                };
+              }
             ];
           }
         ];
@@ -233,20 +341,45 @@ builtins.toJSON {
           datasource = "VictoriaMetrics";
         }
       ];
-      gridPos = { h = 8; w = 24; x = 0; y = 4; };
+      gridPos = {
+        h = 8;
+        w = 24;
+        x = 0;
+        y = 4;
+      };
       fieldConfig = {
         defaults = {
           unit = "short";
           thresholds = {
             mode = "absolute";
             steps = [
-              { color = "red"; value = 0; }
-              { color = "green"; value = 1; }
+              {
+                color = "red";
+                value = 0;
+              }
+              {
+                color = "green";
+                value = 1;
+              }
             ];
           };
           mappings = [
-            { options = { "0" = { text = "DOWN"; }; }; type = "value"; }
-            { options = { "1" = { text = "UP"; }; }; type = "value"; }
+            {
+              options = {
+                "0" = {
+                  text = "DOWN";
+                };
+              };
+              type = "value";
+            }
+            {
+              options = {
+                "1" = {
+                  text = "UP";
+                };
+              };
+              type = "value";
+            }
           ];
         };
       };
@@ -269,7 +402,12 @@ builtins.toJSON {
           datasource = "VictoriaMetrics";
         }
       ];
-      gridPos = { h = 8; w = 12; x = 0; y = 12; };
+      gridPos = {
+        h = 8;
+        w = 12;
+        x = 0;
+        y = 12;
+      };
       fieldConfig = {
         defaults = {
           unit = "reqps";
@@ -287,7 +425,12 @@ builtins.toJSON {
           datasource = "VictoriaMetrics";
         }
       ];
-      gridPos = { h = 8; w = 12; x = 12; y = 12; };
+      gridPos = {
+        h = 8;
+        w = 12;
+        x = 12;
+        y = 12;
+      };
       fieldConfig = {
         defaults = {
           unit = "s";
@@ -304,7 +447,12 @@ builtins.toJSON {
           datasource = "VictoriaLogs";
         }
       ];
-      gridPos = { h = 10; w = 24; x = 0; y = 20; };
+      gridPos = {
+        h = 10;
+        w = 24;
+        x = 0;
+        y = 20;
+      };
       options = {
         showTime = true;
         showLabels = true;
@@ -360,7 +508,12 @@ builtins.toJSON {
           datasource = "VictoriaMetrics";
         }
       ];
-      gridPos = { h = 8; w = 12; x = 0; y = 30; };
+      gridPos = {
+        h = 8;
+        w = 12;
+        x = 0;
+        y = 30;
+      };
       fieldConfig = {
         defaults = {
           unit = "decmbytes";
@@ -376,12 +529,32 @@ builtins.toJSON {
         };
         overrides = [
           {
-            matcher = { id = "byRegexp"; options = ".*limit.*"; };
+            matcher = {
+              id = "byRegexp";
+              options = ".*limit.*";
+            };
             properties = [
-              { id = "custom.lineStyle"; value = { fill = "dash"; }; }
-              { id = "custom.lineWidth"; value = 1; }
-              { id = "color"; value = { mode = "fixed"; fixedColor = "red"; }; }
-              { id = "custom.fillOpacity"; value = 0; }
+              {
+                id = "custom.lineStyle";
+                value = {
+                  fill = "dash";
+                };
+              }
+              {
+                id = "custom.lineWidth";
+                value = 1;
+              }
+              {
+                id = "color";
+                value = {
+                  mode = "fixed";
+                  fixedColor = "red";
+                };
+              }
+              {
+                id = "custom.fillOpacity";
+                value = 0;
+              }
             ];
           }
         ];
@@ -391,7 +564,10 @@ builtins.toJSON {
           showLegend = true;
           displayMode = "table";
           placement = "bottom";
-          calcs = ["lastNotNull" "max"];
+          calcs = [
+            "lastNotNull"
+            "max"
+          ];
         };
         tooltip = {
           mode = "multi";
@@ -434,7 +610,12 @@ builtins.toJSON {
           datasource = "VictoriaMetrics";
         }
       ];
-      gridPos = { h = 8; w = 12; x = 12; y = 30; };
+      gridPos = {
+        h = 8;
+        w = 12;
+        x = 12;
+        y = 30;
+      };
       fieldConfig = {
         defaults = {
           unit = "percent";
@@ -448,19 +629,53 @@ builtins.toJSON {
         };
         overrides = [
           {
-            matcher = { id = "byName"; options = "Warning (80%)"; };
+            matcher = {
+              id = "byName";
+              options = "Warning (80%)";
+            };
             properties = [
-              { id = "custom.lineStyle"; value = { fill = "dash"; }; }
-              { id = "custom.lineWidth"; value = 1; }
-              { id = "color"; value = { mode = "fixed"; fixedColor = "yellow"; }; }
+              {
+                id = "custom.lineStyle";
+                value = {
+                  fill = "dash";
+                };
+              }
+              {
+                id = "custom.lineWidth";
+                value = 1;
+              }
+              {
+                id = "color";
+                value = {
+                  mode = "fixed";
+                  fixedColor = "yellow";
+                };
+              }
             ];
           }
           {
-            matcher = { id = "byName"; options = "Limit (100%)"; };
+            matcher = {
+              id = "byName";
+              options = "Limit (100%)";
+            };
             properties = [
-              { id = "custom.lineStyle"; value = { fill = "dash"; }; }
-              { id = "custom.lineWidth"; value = 1; }
-              { id = "color"; value = { mode = "fixed"; fixedColor = "red"; }; }
+              {
+                id = "custom.lineStyle";
+                value = {
+                  fill = "dash";
+                };
+              }
+              {
+                id = "custom.lineWidth";
+                value = 1;
+              }
+              {
+                id = "color";
+                value = {
+                  mode = "fixed";
+                  fixedColor = "red";
+                };
+              }
             ];
           }
         ];
@@ -499,7 +714,12 @@ builtins.toJSON {
           datasource = "VictoriaMetrics";
         }
       ];
-      gridPos = { h = 8; w = 12; x = 0; y = 38; };
+      gridPos = {
+        h = 8;
+        w = 12;
+        x = 0;
+        y = 38;
+      };
       fieldConfig = {
         defaults = {
           unit = "decmbytes";
@@ -516,33 +736,84 @@ builtins.toJSON {
         };
         overrides = [
           {
-            matcher = { id = "byRegexp"; options = ".*\\(process\\)"; };
+            matcher = {
+              id = "byRegexp";
+              options = ".*\\(process\\)";
+            };
             properties = [
-              { id = "color"; value = { mode = "palette-classic"; }; }
-              { id = "custom.fillOpacity"; value = 100; }
-              { id = "custom.lineWidth"; value = 2; }
+              {
+                id = "color";
+                value = {
+                  mode = "palette-classic";
+                };
+              }
+              {
+                id = "custom.fillOpacity";
+                value = 100;
+              }
+              {
+                id = "custom.lineWidth";
+                value = 2;
+              }
             ];
           }
           {
-            matcher = { id = "byRegexp"; options = ".*\\(cache\\)"; };
+            matcher = {
+              id = "byRegexp";
+              options = ".*\\(cache\\)";
+            };
             properties = [
-              { id = "custom.fillOpacity"; value = 50; }
+              {
+                id = "custom.fillOpacity";
+                value = 50;
+              }
             ];
           }
           {
-            matcher = { id = "byRegexp"; options = ".*\\(kernel\\)"; };
+            matcher = {
+              id = "byRegexp";
+              options = ".*\\(kernel\\)";
+            };
             properties = [
-              { id = "custom.fillOpacity"; value = 30; }
+              {
+                id = "custom.fillOpacity";
+                value = 30;
+              }
             ];
           }
           {
-            matcher = { id = "byRegexp"; options = "Slice Limit.*"; };
+            matcher = {
+              id = "byRegexp";
+              options = "Slice Limit.*";
+            };
             properties = [
-              { id = "custom.lineStyle"; value = { fill = "dash"; }; }
-              { id = "custom.lineWidth"; value = 2; }
-              { id = "color"; value = { mode = "fixed"; fixedColor = "red"; }; }
-              { id = "custom.fillOpacity"; value = 0; }
-              { id = "custom.stacking"; value = { mode = "none"; }; }
+              {
+                id = "custom.lineStyle";
+                value = {
+                  fill = "dash";
+                };
+              }
+              {
+                id = "custom.lineWidth";
+                value = 2;
+              }
+              {
+                id = "color";
+                value = {
+                  mode = "fixed";
+                  fixedColor = "red";
+                };
+              }
+              {
+                id = "custom.fillOpacity";
+                value = 0;
+              }
+              {
+                id = "custom.stacking";
+                value = {
+                  mode = "none";
+                };
+              }
             ];
           }
         ];
@@ -552,7 +823,10 @@ builtins.toJSON {
           showLegend = true;
           displayMode = "table";
           placement = "bottom";
-          calcs = ["lastNotNull" "max"];
+          calcs = [
+            "lastNotNull"
+            "max"
+          ];
         };
       };
     }
@@ -582,7 +856,12 @@ builtins.toJSON {
           datasource = "VictoriaMetrics";
         }
       ];
-      gridPos = { h = 8; w = 12; x = 12; y = 38; };
+      gridPos = {
+        h = 8;
+        w = 12;
+        x = 12;
+        y = 38;
+      };
       fieldConfig = {
         defaults = {
           unit = "decmbytes";
@@ -599,33 +878,84 @@ builtins.toJSON {
         };
         overrides = [
           {
-            matcher = { id = "byRegexp"; options = ".*\\(process\\)"; };
+            matcher = {
+              id = "byRegexp";
+              options = ".*\\(process\\)";
+            };
             properties = [
-              { id = "color"; value = { mode = "palette-classic"; }; }
-              { id = "custom.fillOpacity"; value = 100; }
-              { id = "custom.lineWidth"; value = 2; }
+              {
+                id = "color";
+                value = {
+                  mode = "palette-classic";
+                };
+              }
+              {
+                id = "custom.fillOpacity";
+                value = 100;
+              }
+              {
+                id = "custom.lineWidth";
+                value = 2;
+              }
             ];
           }
           {
-            matcher = { id = "byRegexp"; options = ".*\\(cache\\)"; };
+            matcher = {
+              id = "byRegexp";
+              options = ".*\\(cache\\)";
+            };
             properties = [
-              { id = "custom.fillOpacity"; value = 50; }
+              {
+                id = "custom.fillOpacity";
+                value = 50;
+              }
             ];
           }
           {
-            matcher = { id = "byRegexp"; options = ".*\\(kernel\\)"; };
+            matcher = {
+              id = "byRegexp";
+              options = ".*\\(kernel\\)";
+            };
             properties = [
-              { id = "custom.fillOpacity"; value = 30; }
+              {
+                id = "custom.fillOpacity";
+                value = 30;
+              }
             ];
           }
           {
-            matcher = { id = "byRegexp"; options = "Slice Limit.*"; };
+            matcher = {
+              id = "byRegexp";
+              options = "Slice Limit.*";
+            };
             properties = [
-              { id = "custom.lineStyle"; value = { fill = "dash"; }; }
-              { id = "custom.lineWidth"; value = 2; }
-              { id = "color"; value = { mode = "fixed"; fixedColor = "red"; }; }
-              { id = "custom.fillOpacity"; value = 0; }
-              { id = "custom.stacking"; value = { mode = "none"; }; }
+              {
+                id = "custom.lineStyle";
+                value = {
+                  fill = "dash";
+                };
+              }
+              {
+                id = "custom.lineWidth";
+                value = 2;
+              }
+              {
+                id = "color";
+                value = {
+                  mode = "fixed";
+                  fixedColor = "red";
+                };
+              }
+              {
+                id = "custom.fillOpacity";
+                value = 0;
+              }
+              {
+                id = "custom.stacking";
+                value = {
+                  mode = "none";
+                };
+              }
             ];
           }
         ];
@@ -635,7 +965,10 @@ builtins.toJSON {
           showLegend = true;
           displayMode = "table";
           placement = "bottom";
-          calcs = ["lastNotNull" "max"];
+          calcs = [
+            "lastNotNull"
+            "max"
+          ];
         };
       };
     }
@@ -665,7 +998,12 @@ builtins.toJSON {
           datasource = "VictoriaMetrics";
         }
       ];
-      gridPos = { h = 8; w = 12; x = 0; y = 46; };
+      gridPos = {
+        h = 8;
+        w = 12;
+        x = 0;
+        y = 46;
+      };
       fieldConfig = {
         defaults = {
           unit = "decmbytes";
@@ -682,33 +1020,84 @@ builtins.toJSON {
         };
         overrides = [
           {
-            matcher = { id = "byRegexp"; options = ".*\\(process\\)"; };
+            matcher = {
+              id = "byRegexp";
+              options = ".*\\(process\\)";
+            };
             properties = [
-              { id = "color"; value = { mode = "palette-classic"; }; }
-              { id = "custom.fillOpacity"; value = 100; }
-              { id = "custom.lineWidth"; value = 2; }
+              {
+                id = "color";
+                value = {
+                  mode = "palette-classic";
+                };
+              }
+              {
+                id = "custom.fillOpacity";
+                value = 100;
+              }
+              {
+                id = "custom.lineWidth";
+                value = 2;
+              }
             ];
           }
           {
-            matcher = { id = "byRegexp"; options = ".*\\(cache\\)"; };
+            matcher = {
+              id = "byRegexp";
+              options = ".*\\(cache\\)";
+            };
             properties = [
-              { id = "custom.fillOpacity"; value = 50; }
+              {
+                id = "custom.fillOpacity";
+                value = 50;
+              }
             ];
           }
           {
-            matcher = { id = "byRegexp"; options = ".*\\(kernel\\)"; };
+            matcher = {
+              id = "byRegexp";
+              options = ".*\\(kernel\\)";
+            };
             properties = [
-              { id = "custom.fillOpacity"; value = 30; }
+              {
+                id = "custom.fillOpacity";
+                value = 30;
+              }
             ];
           }
           {
-            matcher = { id = "byRegexp"; options = "Slice Limit.*"; };
+            matcher = {
+              id = "byRegexp";
+              options = "Slice Limit.*";
+            };
             properties = [
-              { id = "custom.lineStyle"; value = { fill = "dash"; }; }
-              { id = "custom.lineWidth"; value = 2; }
-              { id = "color"; value = { mode = "fixed"; fixedColor = "red"; }; }
-              { id = "custom.fillOpacity"; value = 0; }
-              { id = "custom.stacking"; value = { mode = "none"; }; }
+              {
+                id = "custom.lineStyle";
+                value = {
+                  fill = "dash";
+                };
+              }
+              {
+                id = "custom.lineWidth";
+                value = 2;
+              }
+              {
+                id = "color";
+                value = {
+                  mode = "fixed";
+                  fixedColor = "red";
+                };
+              }
+              {
+                id = "custom.fillOpacity";
+                value = 0;
+              }
+              {
+                id = "custom.stacking";
+                value = {
+                  mode = "none";
+                };
+              }
             ];
           }
         ];
@@ -718,7 +1107,10 @@ builtins.toJSON {
           showLegend = true;
           displayMode = "table";
           placement = "bottom";
-          calcs = ["lastNotNull" "max"];
+          calcs = [
+            "lastNotNull"
+            "max"
+          ];
         };
       };
     }
@@ -748,7 +1140,12 @@ builtins.toJSON {
           datasource = "VictoriaMetrics";
         }
       ];
-      gridPos = { h = 8; w = 12; x = 12; y = 46; };
+      gridPos = {
+        h = 8;
+        w = 12;
+        x = 12;
+        y = 46;
+      };
       fieldConfig = {
         defaults = {
           unit = "decmbytes";
@@ -765,33 +1162,84 @@ builtins.toJSON {
         };
         overrides = [
           {
-            matcher = { id = "byRegexp"; options = ".*\\(process\\)"; };
+            matcher = {
+              id = "byRegexp";
+              options = ".*\\(process\\)";
+            };
             properties = [
-              { id = "color"; value = { mode = "palette-classic"; }; }
-              { id = "custom.fillOpacity"; value = 100; }
-              { id = "custom.lineWidth"; value = 2; }
+              {
+                id = "color";
+                value = {
+                  mode = "palette-classic";
+                };
+              }
+              {
+                id = "custom.fillOpacity";
+                value = 100;
+              }
+              {
+                id = "custom.lineWidth";
+                value = 2;
+              }
             ];
           }
           {
-            matcher = { id = "byRegexp"; options = ".*\\(cache\\)"; };
+            matcher = {
+              id = "byRegexp";
+              options = ".*\\(cache\\)";
+            };
             properties = [
-              { id = "custom.fillOpacity"; value = 50; }
+              {
+                id = "custom.fillOpacity";
+                value = 50;
+              }
             ];
           }
           {
-            matcher = { id = "byRegexp"; options = ".*\\(kernel\\)"; };
+            matcher = {
+              id = "byRegexp";
+              options = ".*\\(kernel\\)";
+            };
             properties = [
-              { id = "custom.fillOpacity"; value = 30; }
+              {
+                id = "custom.fillOpacity";
+                value = 30;
+              }
             ];
           }
           {
-            matcher = { id = "byRegexp"; options = "Slice Limit.*"; };
+            matcher = {
+              id = "byRegexp";
+              options = "Slice Limit.*";
+            };
             properties = [
-              { id = "custom.lineStyle"; value = { fill = "dash"; }; }
-              { id = "custom.lineWidth"; value = 2; }
-              { id = "color"; value = { mode = "fixed"; fixedColor = "red"; }; }
-              { id = "custom.fillOpacity"; value = 0; }
-              { id = "custom.stacking"; value = { mode = "none"; }; }
+              {
+                id = "custom.lineStyle";
+                value = {
+                  fill = "dash";
+                };
+              }
+              {
+                id = "custom.lineWidth";
+                value = 2;
+              }
+              {
+                id = "color";
+                value = {
+                  mode = "fixed";
+                  fixedColor = "red";
+                };
+              }
+              {
+                id = "custom.fillOpacity";
+                value = 0;
+              }
+              {
+                id = "custom.stacking";
+                value = {
+                  mode = "none";
+                };
+              }
             ];
           }
         ];
@@ -801,7 +1249,10 @@ builtins.toJSON {
           showLegend = true;
           displayMode = "table";
           placement = "bottom";
-          calcs = ["lastNotNull" "max"];
+          calcs = [
+            "lastNotNull"
+            "max"
+          ];
         };
       };
     }
@@ -816,16 +1267,30 @@ builtins.toJSON {
           datasource = "VictoriaMetrics";
         }
       ];
-      gridPos = { h = 8; w = 24; x = 0; y = 54; };
+      gridPos = {
+        h = 8;
+        w = 24;
+        x = 0;
+        y = 54;
+      };
       fieldConfig = {
         defaults = {
           unit = "short";
           thresholds = {
             mode = "absolute";
             steps = [
-              { color = "green"; value = 0; }
-              { color = "yellow"; value = 1; }
-              { color = "red"; value = 5; }
+              {
+                color = "green";
+                value = 0;
+              }
+              {
+                color = "yellow";
+                value = 1;
+              }
+              {
+                color = "red";
+                value = 5;
+              }
             ];
           };
         };

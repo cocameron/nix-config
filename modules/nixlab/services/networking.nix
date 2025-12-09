@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   constants = import ../../common/constants.nix;
@@ -6,15 +11,24 @@ let
   reverseProxyServicesMap = import ../reverse-proxy-services.nix;
 
   # Services that only support IPv4 (typically containerized services)
-  ipv4OnlyServices = [ "slskd" "qbittorrent" "romm" ];
+  ipv4OnlyServices = [
+    "slskd"
+    "qbittorrent"
+    "romm"
+  ];
 
   # Helper function to create reverse proxy virtual hosts
-  mkVirtualHost = name: config:
+  mkVirtualHost =
+    name: config:
     let
       # Determine the host - use custom host if provided, otherwise localhost/127.0.0.1
-      host = if config ? host then config.host
-             else if builtins.elem name ipv4OnlyServices then "127.0.0.1"
-             else "localhost";
+      host =
+        if config ? host then
+          config.host
+        else if builtins.elem name ipv4OnlyServices then
+          "127.0.0.1"
+        else
+          "localhost";
 
       # Determine scheme (http or https)
       scheme = if config ? scheme then config.scheme else "http";
@@ -26,11 +40,15 @@ let
       upstream = "${scheme}://${host}:${toString port}";
 
       # Additional Caddy config for HTTPS upstreams
-      transportConfig = if scheme == "https" then ''
-        transport http {
-          tls_insecure_skip_verify
-        }
-      '' else "";
+      transportConfig =
+        if scheme == "https" then
+          ''
+            transport http {
+              tls_insecure_skip_verify
+            }
+          ''
+        else
+          "";
     in
     {
       name = "${name}.${constants.domain.nixlab}";
@@ -79,7 +97,8 @@ in
         }
         redir https://glance.${constants.domain.nixlab}{uri} permanent
       '';
-    } // (builtins.listToAttrs (lib.mapAttrsToList mkVirtualHost reverseProxyServicesMap));
+    }
+    // (builtins.listToAttrs (lib.mapAttrsToList mkVirtualHost reverseProxyServicesMap));
 
     package = pkgs.caddy.withPlugins {
       plugins = [

@@ -32,11 +32,11 @@ in
           nodejs_24
           fzf
           ghostscript
-	  jq
-	  flac
-	  yq-go
-	  nvd
-	  nh
+          jq
+          flac
+          yq-go
+          nvd
+          nh
           claude-code
         ]
         ++ config.local.machinePackages;
@@ -196,8 +196,8 @@ in
           python = {
             format = "[$virtualenv]($style) ";
             style = "#859289"; # Everforest grey1
-            detect_extensions = [];
-            detect_files = [];
+            detect_extensions = [ ];
+            detect_files = [ ];
           };
         };
       };
@@ -227,7 +227,9 @@ in
         enableZshIntegration = true;
         extraConfig = ''
           		# Use the system-wide pinentry path
-          		pinentry-program /run/current-system/sw/bin/${if pkgs.stdenv.isDarwin then "pinentry-mac" else "pinentry"}
+          		pinentry-program /run/current-system/sw/bin/${
+              if pkgs.stdenv.isDarwin then "pinentry-mac" else "pinentry"
+            }
           	      '';
       };
     };

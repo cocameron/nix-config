@@ -31,12 +31,6 @@ in
     # Enable the X11 windowing system.
     services.xserver.enable = true;
 
-    # Force 120Hz refresh rate for 4K display
-    # Note: This only applies to X11 sessions, not Wayland
-    services.xserver.screenSection = ''
-      Option "metamodes" "HDMI-0: 3840x2160_120 +0+0"
-    '';
-
     # Use SDDM for better controller support and session selection
     services.displayManager.sddm = {
       enable = true;
@@ -137,22 +131,25 @@ in
     };
 
     # Add packages needed for desktop environment
-    environment.systemPackages = with pkgs; [
-      xsettingsd
-      xorg.xrdb
-      ulauncher
-      # KDE utilities
-      kdePackages.kate  # Text editor
-      kdePackages.konsole  # Terminal
-      everforest-gtk-theme
-      kdePackages.sddm-kcm
+    environment.systemPackages =
+      with pkgs;
+      [
+        xsettingsd
+        xorg.xrdb
+        ulauncher
+        # KDE utilities
+        kdePackages.kate # Text editor
+        kdePackages.konsole # Terminal
+        everforest-gtk-theme
+        kdePackages.sddm-kcm
 
-      # TV-friendly additions
-      antimicrox  # Map gamepad to keyboard/mouse for navigation
-    ] ++ [
-      # Custom SDDM theme
-      sddmTheme
-    ];
+        # TV-friendly additions
+        antimicrox # Map gamepad to keyboard/mouse for navigation
+      ]
+      ++ [
+        # Custom SDDM theme
+        sddmTheme
+      ];
 
     # Enable CUPS to print documents (moved from services.nix)
     services.printing.enable = true;

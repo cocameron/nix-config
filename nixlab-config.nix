@@ -36,9 +36,7 @@ in
       enable = true;
     };
 
-
     programs.ssh.startAgent = true;
-    
 
     # Podman for containers
     virtualisation.podman = {
@@ -57,7 +55,7 @@ in
         wireguard_private_key = {
           owner = constants.primaryUser;
         };
-        cloudflare_api_token = {};
+        cloudflare_api_token = { };
         slskd_pass = {
           owner = constants.primaryUser;
         };
@@ -172,7 +170,6 @@ in
       "root"
       "@wheel"
     ];
-
 
     # Home Manager configuration
     home-manager = {

@@ -43,7 +43,10 @@
     kwin = {
       titlebarButtons = {
         left = [ "close" ];
-        right = [ "minimize" "maximize" ];
+        right = [
+          "minimize"
+          "maximize"
+        ];
       };
     };
 

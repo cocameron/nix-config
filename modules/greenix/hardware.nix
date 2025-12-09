@@ -12,43 +12,35 @@
     inputs.nixos-hardware.nixosModules.common-pc-ssd
     inputs.nixos-hardware.nixosModules.common-cpu-amd
     inputs.nixos-hardware.nixosModules.common-cpu-amd-pstate
-    inputs.nixos-hardware.nixosModules.common-gpu-nvidia # Direct NVIDIA, no PRIME
-    "${inputs.nixos-hardware.outPath}/common/gpu/nvidia/ampere"
+    inputs.nixos-hardware.nixosModules.common-gpu-amd # AMD GPU support
   ];
 
   config = {
     # Enable hardware graphics/OpenGL support
     hardware.graphics = {
       enable = true;
-      enable32Bit = true;  # For 32-bit applications
+      enable32Bit = true; # For 32-bit applications
     };
     hardware.firmware = [
-  (pkgs.runCommand "sony-tv-edid-firmware" {} ''
-    mkdir -p $out/lib/firmware/edid
-    cp ${./sony-tv.edid} $out/lib/firmware/edid/sony-tv.edid
-  '')
-];
+      (pkgs.runCommand "sony-tv-edid-firmware" { } ''
+        mkdir -p $out/lib/firmware/edid
+        cp ${./sony-tv.edid} $out/lib/firmware/edid/sony-tv.edid
+      '')
+    ];
 
-    hardware.nvidia = {
-      # Direct NVIDIA GPU usage - no PRIME (cable plugged into GPU)
-      prime.sync.enable = lib.mkForce false; # Explicitly disable PRIME
-      prime.offload.enable = lib.mkForce false; # Explicitly disable PRIME offload
-      # Disable power management for better gaming performance
-      powerManagement.enable = false;
-      # Enable modesetting for better Wayland support
-      modesetting.enable = true;
-      # Disable force full composition pipeline - let compositor handle sync
-      forceFullCompositionPipeline = false;
+    # Enable firmware for AMD GPU and CPU
+    hardware.enableRedistributableFirmware = true;
 
-      # Use open-source kernel modules (recommended for Ampere and newer)
-      open = true;
-
-      # Package selection - use latest stable
-      package = config.boot.kernelPackages.nvidiaPackages.stable;
-
-      # Keep GPU initialized to prevent display signal loss
-      nvidiaPersistenced = true;
+    # AMD GPU configuration
+    # The amdgpu driver is loaded automatically by the common-gpu-amd module
+    # Enable hardware video acceleration
+    hardware.amdgpu = {
+      # Enable AMD GPU early KMS (kernel mode setting)
+      initrd.enable = true;
+      # Enable OpenCL support for compute workloads
+      opencl.enable = true;
     };
+
     hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
     # Xbox Wireless Adapter support
@@ -75,7 +67,7 @@
       extraConfig.pipewire = {
         "context.properties" = {
           "default.clock.rate" = 48000;
-          "default.clock.quantum" = 2048;  # Increased for 4K
+          "default.clock.quantum" = 2048; # Increased for 4K
           "default.clock.min-quantum" = 1024;
           "default.clock.max-quantum" = 4096;
         };
@@ -83,12 +75,15 @@
           {
             name = "libpipewire-module-rt";
             args = {
-              "nice.level" = -11;  # Higher priority for audio
+              "nice.level" = -11; # Higher priority for audio
               "rt.prio" = 88;
               "rt.time.soft" = 2000000;
               "rt.time.hard" = 2000000;
             };
-            flags = [ "ifexists" "nofail" ];
+            flags = [
+              "ifexists"
+              "nofail"
+            ];
           }
         ];
       };

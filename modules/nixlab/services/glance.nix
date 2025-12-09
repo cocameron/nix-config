@@ -28,15 +28,24 @@ let
   };
 
   # Services that use 127.0.0.1 instead of localhost
-  ipv4OnlyServices = [ "slskd" "qbittorrent" "romm" ];
+  ipv4OnlyServices = [
+    "slskd"
+    "qbittorrent"
+    "romm"
+  ];
 
   # Generate monitor sites from the reverse proxy services map
-  generateMonitorSites = lib.mapAttrsToList (name: value:
+  generateMonitorSites = lib.mapAttrsToList (
+    name: value:
     let
       # Use custom host if provided, otherwise use localhost/127.0.0.1
-      host = if value ? host then value.host
-             else if builtins.elem name ipv4OnlyServices then "127.0.0.1"
-             else "localhost";
+      host =
+        if value ? host then
+          value.host
+        else if builtins.elem name ipv4OnlyServices then
+          "127.0.0.1"
+        else
+          "localhost";
 
       # Use custom scheme if provided
       scheme = if value ? scheme then value.scheme else "http";
@@ -48,7 +57,8 @@ let
       title = value.friendlyName;
       url = "https://${name}.${constants.domain.nixlab}";
       check-url = checkUrl;
-    } // (if serviceIcons ? ${name} then { icon = serviceIcons.${name}; } else {})
+    }
+    // (if serviceIcons ? ${name} then { icon = serviceIcons.${name}; } else { })
   ) reverseProxyServicesMap;
 in
 {
@@ -72,13 +82,13 @@ in
                   type = "monitor";
                   cache = "1m";
                   title = "Services";
-		  hide-header = true;
+                  hide-header = true;
                   style = "compact";
                   sites = generateMonitorSites;
                 }
                 qbittorrent-stats
-		proxmox
-		plex
+                proxmox
+                plex
               ];
             }
             {
@@ -100,9 +110,11 @@ in
                   type = "dns-stats";
                   service = "adguard";
                   hide-header = true;
-                  url = "http://192.168.1.1:3030";  # Update with your AdGuard Home URL
+                  url = "http://192.168.1.1:3030"; # Update with your AdGuard Home URL
                   username = "admin";
-                  password = { _secret = "/run/secrets/adguard_password"; };
+                  password = {
+                    _secret = "/run/secrets/adguard_password";
+                  };
                 }
               ];
             }

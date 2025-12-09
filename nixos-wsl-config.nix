@@ -26,9 +26,11 @@
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    users.colin = { ... }: {
-      imports = [ ./modules/common/home-manager/home.nix ];
-    };
+    users.colin =
+      { ... }:
+      {
+        imports = [ ./modules/common/home-manager/home.nix ];
+      };
     extraSpecialArgs = {
       machinePackages = with pkgs; [ _1password-cli ];
     };

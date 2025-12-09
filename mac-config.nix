@@ -39,12 +39,14 @@ in
     useGlobalPkgs = true;
     useUserPackages = true;
     backupFileExtension = "backup";
-    users.${constants.primaryUser} = { ... }: {
-      imports = [
-        ./modules/common/home-manager/home.nix
-        ./modules/mac/home-manager
-      ];
-    };
+    users.${constants.primaryUser} =
+      { ... }:
+      {
+        imports = [
+          ./modules/common/home-manager/home.nix
+          ./modules/mac/home-manager
+        ];
+      };
     extraSpecialArgs = {
       machinePackages = [ ];
     };
@@ -85,7 +87,7 @@ in
       #   "firefox"
       #   "raycast"
       #   "pinentry-mac"
-    ];#   
+    ];
   };
 
   system.configurationRevision = inputs.rev or inputs.dirtyRev or null;

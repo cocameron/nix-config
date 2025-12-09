@@ -1,24 +1,32 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   # Get memory limits from system-resources module
   memLimits = config.nixlab.memoryLimits;
 
   # Generate system overview dashboard with memory limits
-  systemOverviewDashboard = pkgs.writeText "system-overview.json"
-    (import ./dashboards/system-overview.nix { memoryLimits = memLimits; });
+  systemOverviewDashboard = pkgs.writeText "system-overview.json" (
+    import ./dashboards/system-overview.nix { memoryLimits = memLimits; }
+  );
 
   # Automatically provision other JSON dashboards from the dashboards directory
   dashboardFiles = builtins.readDir ./dashboards;
-  otherDashboards = lib.mapAttrs' (name: type:
-    lib.nameValuePair
-      "grafana/provisioning/dashboards/${name}"
-      { source = ./dashboards/${name}; }
-  ) (lib.filterAttrs (name: type:
-      type == "regular" &&
-      lib.hasSuffix ".json" name &&
-      name != "system-overview.json"
-    ) dashboardFiles);
+  otherDashboards =
+    lib.mapAttrs'
+      (
+        name: type:
+        lib.nameValuePair "grafana/provisioning/dashboards/${name}" { source = ./dashboards/${name}; }
+      )
+      (
+        lib.filterAttrs (
+          name: type: type == "regular" && lib.hasSuffix ".json" name && name != "system-overview.json"
+        ) dashboardFiles
+      );
 
   # Combine generated and static dashboards
   dashboardEtc = otherDashboards // {
@@ -74,14 +82,14 @@ in
           access = "proxy";
           url = "http://127.0.0.1:8428";
           isDefault = true;
-          uid = "victoriametrics";  # Changed to lowercase to avoid conflicts
+          uid = "victoriametrics"; # Changed to lowercase to avoid conflicts
         }
         {
           name = "VictoriaLogs";
           type = "victoriametrics-logs-datasource";
           access = "proxy";
           url = "http://127.0.0.1:9428";
-          uid = "victorialogs";  # Changed to lowercase to avoid conflicts
+          uid = "victorialogs"; # Changed to lowercase to avoid conflicts
         }
       ];
       dashboards = {

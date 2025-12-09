@@ -23,10 +23,13 @@ in
     ./modules/greenix/hardware.nix
     ./modules/greenix/jovian.nix
     ./modules/greenix/packages.nix
+    ./modules/greenix/storage.nix
     ./modules/greenix/users.nix
 
     # Home Manager integration
     inputs.home-manager.nixosModules.default
+    # Noctalia shell
+    inputs.noctalia.nixosModules.default
     # Secrets management
     inputs.sops-nix.nixosModules.default
     # Jovian NixOS for gaming optimizations
@@ -36,8 +39,7 @@ in
   config = {
     # Hostname
     networking.hostName = "greenix";
-    networking.interfaces.enp9s0.wakeOnLan.enable = true;
-    
+    networking.interfaces.enp11s0.wakeOnLan.enable = true;
 
     # Secrets management
     sops = {
@@ -52,6 +54,7 @@ in
     };
 
     services.gnome.gcr-ssh-agent.enable = true;
+
     fonts.packages = with pkgs; [
       nerd-fonts.iosevka-term-slab
       nerd-fonts.noto

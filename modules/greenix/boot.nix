@@ -14,27 +14,26 @@
       let
         themeDir = ./refind-theme;
         # Recursively find all files in a directory
-        listFilesRecursive = dir: path:
+        listFilesRecursive =
+          dir: path:
           let
             entries = builtins.readDir (dir + path);
           in
-            lib.flatten (
-              lib.mapAttrsToList (name: type:
-                if type == "directory" then
-                  listFilesRecursive dir "${path}/${name}"
-                else
-                  "${path}/${name}"
-              ) entries
-            );
+          lib.flatten (
+            lib.mapAttrsToList (
+              name: type:
+              if type == "directory" then listFilesRecursive dir "${path}/${name}" else "${path}/${name}"
+            ) entries
+          );
         # Get all files relative to theme directory
         allFiles = listFilesRecursive themeDir "";
       in
-        builtins.listToAttrs (
-          map (file: {
-            name = "themes/refind-theme${file}";
-            value = themeDir + file;
-          }) allFiles
-        );
+      builtins.listToAttrs (
+        map (file: {
+          name = "themes/refind-theme${file}";
+          value = themeDir + file;
+        }) allFiles
+      );
     boot.loader.grub.enable = false;
     boot.loader.efi.canTouchEfiVariables = true;
     boot.initrd.availableKernelModules = [
@@ -46,15 +45,38 @@
       "sd_mod"
     ];
     boot.initrd.kernelModules = [ ];
+    boot.plymouth = {
+      enable = true;
+      theme = "rings";
+      themePackages = with pkgs; [
+        # By default we would install all themes
+        (adi1090x-plymouth-themes.override {
+          selected_themes = [ "rings" ];
+        })
+      ];
+    };
+
+    # Enable "Silent boot"
+    boot.consoleLogLevel = 3;
+    boot.initrd.verbose = false;
+    # Hide the OS choice for bootloaders.
+    # It's still possible to open the bootloader list by pressing any key
+    # It will just not appear on screen unless a key is pressed
 
     # Compress initrd more aggressively to fit in small boot partition
     boot.initrd.compressor = "zstd";
-    boot.initrd.compressorArgs = [ "-19" "-T0" ];
+    boot.initrd.compressorArgs = [
+      "-19"
+      "-T0"
+    ];
     #boot.initrd.extraFiles."lib/firmware/edid/sony-tv.edid".source = pkgs.copyPathToStore ./sony-tv.edid;
     # Strip initrd to minimal size
     boot.initrd.includeDefaultModules = false;
-    # Load NVIDIA modules during normal boot (not in initrd to save space)
-    boot.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" "kvm-amd" "tcp_bbr" ];
+    # Load AMD GPU and other modules during normal boot (amdgpu loaded by initrd KMS)
+    boot.kernelModules = [
+      "kvm-amd"
+      "tcp_bbr"
+    ];
     boot.extraModulePackages = [ ];
     #boot.loader.systemd-boot.enable = true;
     #boot.loader.systemd-boot.configurationLimit = 2;
@@ -64,11 +86,16 @@
     # TODO: Resize boot partition to 512MB+ and switch back to linuxPackages_latest
     boot.kernelPackages = pkgs.linuxPackages;
 
-    # Kernel parameters for NVIDIA + Gamescope
+    # Kernel parameters for AMD GPU + Gamescope
     boot.kernelParams = [
-      "nvidia-drm.modeset=1" # Required for NVIDIA with Gamescope/Wayland
-      "nvidia-drm.fbdev=1"   # Enable framebuffer device for console
-      "modprobe.blacklist=amdgpu"  # Don't load amdgpu driver at al
+      "quiet"
+      "splash"
+      "boot.shell_on_fail"
+      "loglevel=3"
+      "rd.udev.log_level=3"
+      "udev.log_priority=3"
+      "rd.systemd.show_status=false"
+      "vt.global_cursor_default=0"
     ];
 
     # Gaming-specific kernel parameters

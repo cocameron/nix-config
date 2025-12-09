@@ -7,6 +7,8 @@
       pkgs.aider-chat-with-help
       pkgs.obsidian
       pkgs.heroic
+      pkgs.xwayland-satellite
+      pkgs.yarg
     ];
   };
 }

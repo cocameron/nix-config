@@ -7,7 +7,7 @@
 }:
 let
   constants = import ../../common/constants.nix;
-  unpackerrPkg = pkgs.callPackage ../packages/unpackerr.nix {};
+  unpackerrPkg = pkgs.callPackage ../packages/unpackerr.nix { };
 in
 {
   imports = [
@@ -40,7 +40,7 @@ in
             "8888:8888/tcp" # Gluetun Local Network HTTP proxy
             "8388:8388/tcp" # Gluetun Local Network Shadowsocks
             "8388:8388/udp" # Gluetun Local Network Shadowsocks
-            "8200:8200"     # qbit web ui
+            "8200:8200" # qbit web ui
           ];
           extraConfig = {
             Service.Slice = "media.slice";
@@ -60,7 +60,7 @@ in
           };
           environmentFile = [ "/home/colin/.config/gluetun/gluetun-qbt.env" ];
         };
-        
+
         # Second gluetun instance for slskd
         gluetun-slskd = {
           image = "qmcgaw/gluetun";
@@ -73,7 +73,7 @@ in
           ];
           ports = [
             "8389:8388/tcp" # Shadowsocks (different port to avoid conflict)
-            "5030:5030"     # slskd web ui
+            "5030:5030" # slskd web ui
           ];
           extraConfig = {
             Service.Slice = "media.slice";
@@ -91,7 +91,7 @@ in
             FIREWALL_OUTBOUND_SUBNETS = "169.254.0.0/16";
           };
         };
-        
+
         qbittorrent = {
           image = "qbittorrentofficial/qbittorrent-nox";
           userNS = "keep-id";
@@ -115,7 +115,7 @@ in
             QBT_DOWNLOADS_PATH = "/downloads";
           };
         };
-        
+
         slskd = {
           image = "slskd/slskd";
           userNS = "keep-id";
@@ -211,7 +211,7 @@ in
 
       };
     };
-    
+
     # Service to monitor VPN port changes and update slskd
     systemd.user.services.slskd-port-monitor = {
       Unit = {
@@ -224,7 +224,7 @@ in
         RemainAfterExit = false;
       };
     };
-    
+
     systemd.user.timers.slskd-port-monitor = {
       Unit = {
         Description = "Check for slskd port changes every minute";

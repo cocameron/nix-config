@@ -17,11 +17,11 @@ in
 
   # Don't ask for passwords for wheel users
   security.sudo.wheelNeedsPassword = false;
-    services.openssh = {
-      enable = true;
-      settings.PasswordAuthentication = false;
-      settings.KbdInteractiveAuthentication = false;
-    };
+  services.openssh = {
+    enable = true;
+    settings.PasswordAuthentication = false;
+    settings.KbdInteractiveAuthentication = false;
+  };
 
   # Common packages needed across Linux systems
   environment.systemPackages = with pkgs; [

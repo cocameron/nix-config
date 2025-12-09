@@ -6,24 +6,26 @@ in
   time.timeZone = constants.timezone;
   nixpkgs.config.allowUnfree = true;
   nix = {
-    gc =
-      {
-        automatic = true;
-        options = "--delete-older-than 7d";
-      }
-      // lib.optionalAttrs pkgs.stdenv.isDarwin {
-        interval = {
-          Weekday = 0;
-          Hour = 0;
-          Minute = 0;
-        };
-      }
-      // lib.optionalAttrs pkgs.stdenv.isLinux {
-        dates = "weekly";
+    gc = {
+      automatic = true;
+      options = "--delete-older-than 7d";
+    }
+    // lib.optionalAttrs pkgs.stdenv.isDarwin {
+      interval = {
+        Weekday = 0;
+        Hour = 0;
+        Minute = 0;
       };
+    }
+    // lib.optionalAttrs pkgs.stdenv.isLinux {
+      dates = "weekly";
+    };
     settings = {
       experimental-features = "nix-command flakes";
-      trusted-users = [ "root" constants.primaryUser ];
+      trusted-users = [
+        "root"
+        constants.primaryUser
+      ];
     };
     optimise = {
       automatic = true;

@@ -3,9 +3,14 @@
   config = {
     environment.systemPackages = with pkgs; [
       lutris
-      (retroarch.withCores (cores: with cores; [
-        dolphin
-      ]))
+      (retroarch.withCores (
+        cores: with cores; [
+          dolphin
+          mgba      # Game Boy Advance
+          gambatte  # Game Boy / Game Boy Color
+	  pcsx2
+        ]
+      ))
       boilr
       mangohud # In-game FPS/performance overlay
       goverlay # GUI for MangoHud configuration
@@ -41,7 +46,7 @@
       settings.general.renice = 10; # Renice games for better priority
     };
 
-    # Sunshine for game streaming (NVIDIA GPU-accelerated)
+    # Sunshine for game streaming (GPU-accelerated)
     services.sunshine = {
       enable = true;
       autoStart = true;
@@ -50,7 +55,11 @@
     };
 
     # Add user to required groups for Sunshine GPU access
-    users.users.colin.extraGroups = [ "video" "render" "input" ];
+    users.users.colin.extraGroups = [
+      "video"
+      "render"
+      "input"
+    ];
 
     # Udev rules for DualSense controller access in Sunshine
     services.udev.extraRules = ''

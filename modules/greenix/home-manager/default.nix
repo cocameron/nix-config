@@ -1,21 +1,28 @@
-{ lib, pkgs, inputs, ... }:
+{
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 let
   # Everforest Dark Hard palette colors
   everforestColors = [
-    "#e67e80"  # Red
-    "#e69875"  # Orange
-    "#dbbc7f"  # Yellow
-    "#a7c080"  # Green
-    "#83c092"  # Aqua
-    "#7fbbb3"  # Blue
-    "#d699b6"  # Purple
+    "#e67e80" # Red
+    "#e69875" # Orange
+    "#dbbc7f" # Yellow
+    "#a7c080" # Green
+    "#83c092" # Aqua
+    "#7fbbb3" # Blue
+    "#d699b6" # Purple
   ];
 
   # Map workspace ID to Everforest color (cycles through palette)
-  workspaceIdToColor = id:
+  workspaceIdToColor =
+    id:
     let
       colorIndex = lib.mod (id - 1) (builtins.length everforestColors);
-    in builtins.elemAt everforestColors colorIndex;
+    in
+    builtins.elemAt everforestColors colorIndex;
 
   # Script to update waybar border color based on active workspace
   updateWaybarBorder = pkgs.writeShellScript "update-waybar-border" ''
@@ -47,9 +54,12 @@ let
   '';
 
   # Generate CSS rules for workspace colors (IDs 1-30)
-  workspaceColorCSS = lib.concatMapStringsSep "\n" (id:
-    let color = workspaceIdToColor id;
-    in ''
+  workspaceColorCSS = lib.concatMapStringsSep "\n" (
+    id:
+    let
+      color = workspaceIdToColor id;
+    in
+    ''
       #workspaces button#niri-workspace-${toString id} {
         color: ${color};
       }
@@ -64,8 +74,9 @@ in
     ../../common/home-manager/home.nix
     ./plasma.nix
     inputs.niri.homeModules.niri
-    inputs.dankMaterialShell.homeModules.dankMaterialShell.default
-    inputs.dankMaterialShell.homeModules.dankMaterialShell.niri
+    inputs.noctalia.homeModules.default
+    # inputs.dankMaterialShell.homeModules.dankMaterialShell.default
+    # inputs.dankMaterialShell.homeModules.dankMaterialShell.niri
   ];
 
   # Environment variables for 65" TV scaling
@@ -84,71 +95,119 @@ in
     MOZ_USE_XINPUT2 = "1";
   };
   programs.niri.settings = {
+    prefer-no-csd = true;
+    layout.focus-ring = {
+      active.color = "#7fbbb3";
+    };
+    window-rules = [
+      # Keep games at full opacity even when inactive
+      # Add your game app-ids here (use `niri msg pick-window` to find them)
+      {
+        matches = [
+          { app-id = "^steam_app_.*"; }  # Steam games
+        ];
+        opacity = 1.0;
+      }
+      {
+        matches = [
+          { app-id = "^gamescope$"; }  # Gamescope
+        ];
+        opacity = 1.0;
+      }
+      # Apply opacity to inactive windows (excluding games above)
+      {
+      	matches = [
+	  { is-active = false; }
+	];
+	opacity = 0.8;
+      }
+      {
+        geometry-corner-radius = {
+	  bottom-left = 8.0;
+	  bottom-right = 8.0;
+	  top-left = 8.0;
+	  top-right = 8.0;
+	};
+	clip-to-geometry = true;
+      }
+    ];
     outputs."HDMI-A-1" = {
       mode = {
         width = 3840;
-	height = 2160;
+        height = 2160;
       };
       scale = 2.0;
     };
 
+    outputs."DP-1" = {
+      mode = {
+        width = 3840;
+        height = 2160;
+      };
+      scale = 2.0;
+    };
+    xwayland-satellite = {
+      enable = true;
+      path = lib.getExe pkgs.xwayland-satellite;
+    };
+
     binds = {
-      "Mod+Q".action.close-window = {};
+      "Mod+Q".action.close-window = { };
 
-      "Mod+Left".action.focus-column-left = {};
-      "Mod+Down".action.focus-window-down = {};
-      "Mod+Up".action.focus-window-up = {};
-      "Mod+Right".action.focus-column-right = {};
-      "Mod+H".action.focus-column-left = {};
-      "Mod+J".action.focus-window-down = {};
-      "Mod+K".action.focus-window-up = {};
-      "Mod+L".action.focus-column-right = {};
+      "Mod+Left".action.focus-column-left = { };
+      "Mod+Down".action.focus-window-down = { };
+      "Mod+Up".action.focus-window-up = { };
+      "Mod+Right".action.focus-column-right = { };
+      "Mod+H".action.focus-column-left = { };
+      "Mod+J".action.focus-window-down = { };
+      "Mod+K".action.focus-window-up = { };
+      "Mod+BracketLeft".action.consume-or-expel-window-left = { };
+      "Mod+BracketRight".action.consume-or-expel-window-right = { };
 
-      "Mod+Ctrl+Left".action.move-column-left = {};
-      "Mod+Ctrl+Down".action.move-window-down = {};
-      "Mod+Ctrl+Up".action.move-window-up = {};
-      "Mod+Ctrl+Right".action.move-column-right = {};
-      "Mod+Ctrl+H".action.move-column-left = {};
-      "Mod+Ctrl+J".action.move-window-down = {};
-      "Mod+Ctrl+K".action.move-window-up = {};
-      "Mod+Ctrl+L".action.move-column-right = {};
+      "Mod+Ctrl+Left".action.move-column-left = { };
+      "Mod+Ctrl+Down".action.move-window-down = { };
+      "Mod+Ctrl+Up".action.move-window-up = { };
+      "Mod+Ctrl+Right".action.move-column-right = { };
+      "Mod+Ctrl+H".action.move-column-left = { };
+      "Mod+Ctrl+J".action.move-window-down = { };
+      "Mod+Ctrl+K".action.move-window-up = { };
+      "Mod+Ctrl+L".action.move-column-right = { };
 
-      "Mod+Home".action.focus-column-first = {};
-      "Mod+End".action.focus-column-last = {};
-      "Mod+Ctrl+Home".action.move-column-to-first = {};
-      "Mod+Ctrl+End".action.move-column-to-last = {};
+      "Mod+Home".action.focus-column-first = { };
+      "Mod+End".action.focus-column-last = { };
+      "Mod+Ctrl+Home".action.move-column-to-first = { };
+      "Mod+Ctrl+End".action.move-column-to-last = { };
 
-      "Mod+Shift+Left".action.focus-monitor-left = {};
-      "Mod+Shift+Down".action.focus-monitor-down = {};
-      "Mod+Shift+Up".action.focus-monitor-up = {};
-      "Mod+Shift+Right".action.focus-monitor-right = {};
-      "Mod+Shift+H".action.focus-monitor-left = {};
-      "Mod+Shift+J".action.focus-monitor-down = {};
-      "Mod+Shift+K".action.focus-monitor-up = {};
-      "Mod+Shift+L".action.focus-monitor-right = {};
+      "Mod+Shift+Left".action.focus-monitor-left = { };
+      "Mod+Shift+Down".action.focus-monitor-down = { };
+      "Mod+Shift+Up".action.focus-monitor-up = { };
+      "Mod+Shift+Right".action.focus-monitor-right = { };
+      "Mod+Shift+H".action.focus-monitor-left = { };
+      "Mod+Shift+J".action.focus-monitor-down = { };
+      "Mod+Shift+K".action.focus-monitor-up = { };
+      "Mod+Shift+L".action.focus-monitor-right = { };
 
-      "Mod+Shift+Ctrl+Left".action.move-column-to-monitor-left = {};
-      "Mod+Shift+Ctrl+Down".action.move-column-to-monitor-down = {};
-      "Mod+Shift+Ctrl+Up".action.move-column-to-monitor-up = {};
-      "Mod+Shift+Ctrl+Right".action.move-column-to-monitor-right = {};
-      "Mod+Shift+Ctrl+H".action.move-column-to-monitor-left = {};
-      "Mod+Shift+Ctrl+J".action.move-column-to-monitor-down = {};
-      "Mod+Shift+Ctrl+K".action.move-column-to-monitor-up = {};
-      "Mod+Shift+Ctrl+L".action.move-column-to-monitor-right = {};
+      "Mod+Shift+Ctrl+Left".action.move-column-to-monitor-left = { };
+      "Mod+Shift+Ctrl+Down".action.move-column-to-monitor-down = { };
+      "Mod+Shift+Ctrl+Up".action.move-column-to-monitor-up = { };
+      "Mod+Shift+Ctrl+Right".action.move-column-to-monitor-right = { };
+      "Mod+Shift+Ctrl+H".action.move-column-to-monitor-left = { };
+      "Mod+Shift+Ctrl+J".action.move-column-to-monitor-down = { };
+      "Mod+Shift+Ctrl+K".action.move-column-to-monitor-up = { };
 
-      "Mod+Page_Down".action.focus-workspace-down = {};
-      "Mod+Page_Up".action.focus-workspace-up = {};
-      "Mod+U".action.focus-workspace-down = {};
-      "Mod+I".action.focus-workspace-up = {};
-      "Mod+Ctrl+Page_Down".action.move-column-to-workspace-down = {};
-      "Mod+Ctrl+Page_Up".action.move-column-to-workspace-up = {};
-      "Mod+Ctrl+U".action.move-column-to-workspace-down = {};
-      "Mod+Ctrl+I".action.move-column-to-workspace-up = {};
+      "Mod+Page_Down".action.focus-workspace-down = { };
+      "Mod+Page_Up".action.focus-workspace-up = { };
+      "Mod+U".action.focus-workspace-down = { };
+      "Mod+I".action.focus-workspace-up = { };
+      "Mod+Ctrl+Page_Down".action.move-column-to-workspace-down = { };
+      "Mod+Ctrl+Page_Up".action.move-column-to-workspace-up = { };
+      "Mod+Ctrl+U".action.move-column-to-workspace-down = { };
+      "Mod+Ctrl+I".action.move-column-to-workspace-up = { };
 
-      "Mod+Shift+Page_Down".action.move-workspace-down = {};
-      "Mod+Shift+Page_Up".action.move-workspace-up = {};
-      "Mod+Shift+U".action.move-workspace-down = {};
-      "Mod+Shift+I".action.move-workspace-up = {};
+      "Mod+Shift+Page_Down".action.move-workspace-down = { };
+      "Mod+Shift+Page_Up".action.move-workspace-up = { };
+      "Mod+Shift+U".action.move-workspace-down = { };
+      "Mod+Shift+I".action.move-workspace-up = { };
 
       "Mod+1".action.focus-workspace = 1;
       "Mod+2".action.focus-workspace = 2;
@@ -169,13 +228,11 @@ in
       "Mod+Ctrl+8".action.move-column-to-workspace = 8;
       "Mod+Ctrl+9".action.move-column-to-workspace = 9;
 
-      "Mod+Comma".action.consume-window-into-column = {};
-      "Mod+Period".action.expel-window-from-column = {};
+      "Mod+Period".action.expel-window-from-column = { };
 
-      "Mod+R".action.switch-preset-column-width = {};
-      "Mod+F".action.maximize-column = {};
-      "Mod+Shift+F".action.fullscreen-window = {};
-      "Mod+C".action.center-column = {};
+      "Mod+R".action.switch-preset-column-width = { };
+      "Mod+F".action.maximize-column = { };
+      "Mod+Shift+F".action.fullscreen-window = { };
 
       "Mod+Minus".action.set-column-width = "-10%";
       "Mod+Equal".action.set-column-width = "+10%";
@@ -183,27 +240,170 @@ in
       "Mod+Shift+Minus".action.set-window-height = "-10%";
       "Mod+Shift+Equal".action.set-window-height = "+10%";
 
-      "Print".action.screenshot = {};
-      "Ctrl+Print".action.screenshot-screen = {};
-      "Alt+Print".action.screenshot-window = {};
+      "Print".action.screenshot = { };
+      "Ctrl+Print".action.screenshot-screen = { };
+      "Alt+Print".action.screenshot-window = { };
 
-      "Mod+Shift+E".action.quit = {};
+      "Mod+Shift+E".action.quit = { };
 
-      "Mod+Shift+P".action.power-off-monitors = {};
+      "Mod+Shift+P".action.power-off-monitors = { };
 
-      "Mod+T".action.spawn = ["ghostty"];
-      "Mod+Shift+Slash".action.show-hotkey-overlay = {};
+      "Mod+T".action.spawn = [ "ghostty" ];
+      "Mod+Shift+Slash".action.show-hotkey-overlay = { };
+
+      # Noctalia shell keybinds
+      "Mod+Space".action.spawn = [
+        "noctalia-shell"
+        "ipc"
+        "call"
+        "launcher"
+        "toggle"
+      ];
+      "Mod+S".action.spawn = [
+        "noctalia-shell"
+        "ipc"
+        "call"
+        "controlCenter"
+        "toggle"
+      ];
+      "Mod+Comma".action.spawn = [
+        "noctalia-shell"
+        "ipc"
+        "call"
+        "settings"
+        "toggle"
+      ];
+
+      # Audio controls
+      "XF86AudioRaiseVolume".action.spawn = [
+        "noctalia-shell"
+        "ipc"
+        "call"
+        "volume"
+        "increase"
+      ];
+      "XF86AudioLowerVolume".action.spawn = [
+        "noctalia-shell"
+        "ipc"
+        "call"
+        "volume"
+        "decrease"
+      ];
+      "XF86AudioMute".action.spawn = [
+        "noctalia-shell"
+        "ipc"
+        "call"
+        "volume"
+        "muteOutput"
+      ];
+
+      # Brightness controls
+      "XF86MonBrightnessUp".action.spawn = [
+        "noctalia-shell"
+        "ipc"
+        "call"
+        "brightness"
+        "increase"
+      ];
+      "XF86MonBrightnessDown".action.spawn = [
+	      "noctalia-shell"
+		      "ipc"
+		      "call"
+		      "brightness"
+		      "decrease"
+      ];
+
+# Utility shortcuts
+      "Mod+V".action.spawn = [
+	      "noctalia-shell"
+        "ipc"
+        "call"
+        "launcher"
+        "clipboard"
+      ];
+      "Mod+C".action.spawn = [
+        "noctalia-shell"
+        "ipc"
+        "call"
+        "launcher"
+        "calculator"
+      ];
+      "Mod+L".action.spawn = [
+        "noctalia-shell"
+        "ipc"
+        "call"
+        "lockScreen"
+        "lock"
+      ];
     };
   };
 
   programs.fuzzel.enable = true;
-  programs.dankMaterialShell = {
-    enable = true;
-    niri = {
-      enableSpawn = true;
-    };
-  };
 
+  programs.noctalia-shell = {
+    enable = true;
+    systemd.enable = true;
+    settings = {
+      # configure noctalia here; defaults will
+      # be deep merged with these attributes.
+      bar = {
+        position = "top";
+        showCapsule = false;
+	floating = true;
+        widgets = {
+          left = [
+            {
+              id = "ControlCenter";
+              useDistroLogo = true;
+            }
+          ];
+          center = [
+            {
+              hideUnoccupied = false;
+              id = "Workspace";
+              labelMode = "none";
+            }
+          ];
+          right = [
+            {
+              formatHorizontal = "HH:mm";
+              formatVertical = "HH mm";
+              id = "Clock";
+              useMonospacedFont = true;
+              usePrimaryColor = true;
+            }
+          ];
+        };
+      };
+      colorSchemes.predefinedScheme = "Everforest";
+      general = {
+        avatarImage = "/home/drfoobar/.face";
+        radiusRatio = 0.2;
+      };
+      location = {
+        monthBeforeDay = true;
+        name = "Portland, United States";
+      };
+      controlCenter = {
+      	cards = [
+          {
+	    id = "profile-card";
+	    enabled = true;
+	  }
+	  {
+	    id = "audio-card";
+	    enabled = true;
+	  }
+	  {
+	    id = "network-card";
+	    enabled = false;
+	  }
+	];
+      };
+    };
+    # this may also be a string or a path to a JSON file,
+    # but in this case must include *all* settings.
+  };
   # Configure xdg-desktop-portal to use GTK backend for niri
   # This prevents timeout issues when multiple portal backends are installed
   xdg.portal = {
@@ -251,80 +451,94 @@ in
   programs.waybar = {
     enable = false;
     systemd.enable = true;
-    settings = { mainbar = {
-      layer = "top";
-      height = 48; # Increased for TV viewing (was 32)
-      margin-top = 4;
-      margin-left = 4;
-      margin-right = 4;
-      spacing = 0;
-      modules-left = [ "network" "wlr/taskbar" "niri/workspaces"];
-      modules-center = [ "clock" ];
-      modules-right = [ "systemd-failed-units" "pulseaudio" "cpu" "memory" ];
-      "systemd-failed-units" = {
-        hide-on-ok = true;
-        system = true;
-        user = false;
-      };
-
-      "wlr/taskbar" = {
-        format = "{icon}";
-        tooltip-format = "{title} | {app_id}";
-        on-click = "activate";
-        on-click-middle = "close";
-        on-click-right = "fullscreen";
-      };
-
-      "niri/workspaces" = {
-        format = "{icon}";
-        format-icons = {
-          default = "";
-          active = "";
-	  };
-      };
-
-      clock = {
-        tooltip-format = "<small>{calendar}</small>";
-        format = " {:%B %e %H:%M}";
-      };
-
-      cpu = {
-        format = " {usage}%";
-        tooltip = false;
-      };
-
-      memory = {
-        format = " {}%";
-      };
-
-      network = {
-        tooltip-format = "{ifname} via {gwaddr}";
-	format = "";
-        format-disconnected = "󰈂";
-      };
-
-      pulseaudio = {
-        format = "{volume}% {icon}";
-        format-bluetooth = "{volume}% {icon}";
-        format-bluetooth-muted = " {icon}";
-        format-muted = "";
-        format-source = "{volume}% ";
-        format-source-muted = "";
-        format-icons = {
-          headphone = "";
-          hands-free = "";
-          headset = "";
-          phone = "";
-          portable = "";
-          car = "";
-          default = [ "" "" "" ];
+    settings = {
+      mainbar = {
+        layer = "top";
+        height = 48; # Increased for TV viewing (was 32)
+        margin-top = 4;
+        margin-left = 4;
+        margin-right = 4;
+        spacing = 0;
+        modules-left = [
+          "network"
+          "wlr/taskbar"
+          "niri/workspaces"
+        ];
+        modules-center = [ "clock" ];
+        modules-right = [
+          "systemd-failed-units"
+          "pulseaudio"
+          "cpu"
+          "memory"
+        ];
+        "systemd-failed-units" = {
+          hide-on-ok = true;
+          system = true;
+          user = false;
         };
-        on-click = "pavucontrol";
-      };
 
-      tray = {
-        spacing = 10;
-      };
+        "wlr/taskbar" = {
+          format = "{icon}";
+          tooltip-format = "{title} | {app_id}";
+          on-click = "activate";
+          on-click-middle = "close";
+          on-click-right = "fullscreen";
+        };
+
+        "niri/workspaces" = {
+          format = "{icon}";
+          format-icons = {
+            default = "";
+            active = "";
+          };
+        };
+
+        clock = {
+          tooltip-format = "<small>{calendar}</small>";
+          format = " {:%B %e %H:%M}";
+        };
+
+        cpu = {
+          format = " {usage}%";
+          tooltip = false;
+        };
+
+        memory = {
+          format = " {}%";
+        };
+
+        network = {
+          tooltip-format = "{ifname} via {gwaddr}";
+          format = "";
+          format-disconnected = "󰈂";
+        };
+
+        pulseaudio = {
+          format = "{volume}% {icon}";
+          format-bluetooth = "{volume}% {icon}";
+          format-bluetooth-muted = " {icon}";
+          format-muted = "";
+          format-source = "{volume}% ";
+          format-source-muted = "";
+          format-icons = {
+            headphone = "";
+            hands-free = "";
+            headset = "";
+            phone = "";
+            portable = "";
+            car = "";
+            default = [
+              ""
+              ""
+              ""
+            ];
+          };
+          on-click = "pavucontrol";
+        };
+
+        tray = {
+          spacing = 10;
+        };
       };
     };
     style = ''
@@ -364,28 +578,28 @@ in
     enable = true;
     font.name = "Noto Sans";
   };
-  
+
   systemd.user.services.init-display-mode = {
-  Unit = {
-    Description = "Initialize display to safe mode";
-    Before = "gamescope-session.service";
+    Unit = {
+      Description = "Initialize display to safe mode";
+      Before = "gamescope-session.service";
+    };
+    Install = {
+      WantedBy = [ "gamescope-session.target" ];
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.writeShellScript "init-display" ''
+        sleep 5
+        ${pkgs.libdrm}/bin/modetest -M amdgpu -s 127:1920x1080@60 || true
+      ''}";
+    };
   };
-  Install = {
-    WantedBy = [ "gamescope-session.target" ];
-  };
-  Service = {
-    Type = "oneshot";
-    ExecStart = "${pkgs.writeShellScript "init-display" ''
-      sleep 5
-      ${pkgs.libdrm}/bin/modetest -M nvidia-drm -s 127:1920x1080@60 || true
-    ''}";
-  };
-};
-  
-# In configuration.nix or a system-level module
+
+  # In configuration.nix or a system-level module
   # Start swaybg with wallpaper on login (niri only)
   # Based on niri documentation: https://github.com/YaLTeR/niri/wiki/Example-systemd-Setup
-systemd.user.services.swaybg = {
+  systemd.user.services.swaybg = {
     Unit = {
       Description = "Wayland wallpaper daemon";
       PartOf = [ "graphical-session.target" ];
@@ -416,7 +630,6 @@ systemd.user.services.swaybg = {
   #   '';
   #   force = true;  # Allow script to modify this file
   # };
-
 
   programs.ghostty = {
     enable = true;
