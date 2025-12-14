@@ -9,6 +9,7 @@
       pkgs.heroic
       pkgs.xwayland-satellite
       pkgs.yarg
+      pkgs.sbctl
     ];
   };
 }

@@ -13,11 +13,9 @@
       url = "github:AvengeMedia/dgop";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
-    dankMaterialShell = {
-      url = "github:AvengeMedia/DankMaterialShell";
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote/v1.0.0";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.dgop.follows = "dgop";
     };
     noctalia = {
       url = "github:noctalia-dev/noctalia-shell";

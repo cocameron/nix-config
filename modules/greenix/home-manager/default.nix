@@ -596,6 +596,25 @@ in
     };
   };
 
+  # Override noctalia-shell service to configure Qt for Wayland and bind to niri
+  # Noctalia-shell is a desktop shell that runs on top of niri (the compositor)
+  # It needs QT_QPA_PLATFORM=wayland to use Qt's Wayland platform plugin
+  # By binding to niri.service, it only starts with niri, not other Wayland sessions
+  systemd.user.services.noctalia-shell = {
+    Unit = {
+      # Ensure noctalia-shell starts after niri has created the Wayland socket
+      After = [ "niri.service" ];
+      Requisite = [ "niri.service" ];
+    };
+    Service = {
+      Environment = [ "QT_QPA_PLATFORM=wayland" ];
+    };
+    Install = {
+      # Override upstream WantedBy to bind to niri only, not all graphical sessions
+      WantedBy = lib.mkForce [ "niri.service" ];
+    };
+  };
+
   # In configuration.nix or a system-level module
   # Start swaybg with wallpaper on login (niri only)
   # Based on niri documentation: https://github.com/YaLTeR/niri/wiki/Example-systemd-Setup

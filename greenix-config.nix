@@ -34,6 +34,7 @@ in
     inputs.sops-nix.nixosModules.default
     # Jovian NixOS for gaming optimizations
     inputs.jovian.nixosModules.jovian
+    inputs.lanzaboote.nixosModules.lanzaboote
   ];
 
   config = {

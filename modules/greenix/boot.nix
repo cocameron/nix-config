@@ -7,7 +7,13 @@
 {
   config = {
     # Bootloader.
-    boot.loader.refind.enable = true;
+    boot.loader.systemd-boot.enable = lib.mkForce false;
+    boot.loader.systemd-boot.configurationLimit = 2;
+    boot.lanzaboote = {
+      enable = true;
+      pkiBundle = "/var/lib/sbctl";
+    };
+#    boot.loader.refind.enable = true;
     boot.loader.refind.extraConfig = "include themes/refind-theme/theme.conf";
     boot.loader.refind.maxGenerations = 2;
     boot.loader.refind.additionalFiles =
@@ -78,9 +84,6 @@
       "tcp_bbr"
     ];
     boot.extraModulePackages = [ ];
-    #boot.loader.systemd-boot.enable = true;
-    #boot.loader.systemd-boot.configurationLimit = 2;
-    #boot.loader.efi.canTouchEfiVariables = true;
 
     # Use LTS kernel for smaller initrd (temporary workaround for small boot partition)
     # TODO: Resize boot partition to 512MB+ and switch back to linuxPackages_latest
