@@ -14,19 +14,23 @@ Rectangle {
     property string userName: userModel.lastUser
 
     // Auto-select configuration
-    property int autoSelectTimeout: 7000  // 7 seconds in milliseconds
+    property int autoSelectTimeout: 14000  // 14 seconds in milliseconds
     property string autoSelectSessionName: "gamescope"  // Session to auto-select
     property real autoSelectStartTime: 0
 
     // Find the gaming session index
     function findGamingSessionIndex() {
+        console.log("Searching for gaming session among", sessionModel.rowCount(), "sessions")
         for (var i = 0; i < sessionModel.rowCount(); i++) {
             var sessionName = sessionModel.data(sessionModel.index(i, 0), 257).toLowerCase()  // Qt.DisplayRole = 257
+            console.log("  Session", i + ":", sessionName)
             if (sessionName.includes("gamescope") || sessionName.includes("steam") || sessionName.includes("jovian")) {
+                console.log("  -> Found gaming session at index", i)
                 return i
             }
         }
-        return selectedSessionIndex  // Fallback to last used session
+        console.log("  -> Gaming session not found, defaulting to index 0")
+        return 0  // Fallback to index 0 (where steamos gamescope should be)
     }
 
     // Auto-select timer
@@ -52,8 +56,7 @@ Rectangle {
         anchors.fill: parent
         propagateComposedEvents: true
         onPressed: {
-            autoSelectTimer.restart()
-            mouse.accepted = false
+            autoSelectTimer.running = false
         }
         onPositionChanged: {
             autoSelectTimer.restart()
@@ -114,21 +117,10 @@ Rectangle {
                     id: sessionItem
                     anchors.fill: parent
                     anchors.margins: 15
-                    color: sessionMouseArea.containsMouse ? "#45475a" : "#313244"
+                    color: "#313244"
                     radius: 15
-                    border.color: sessionMouseArea.containsMouse ? "#89b4fa" : "#45475a"
-                    border.width: sessionMouseArea.containsMouse ? 3 : 2
-
-                    // Smooth transition for hover effect
-                    Behavior on color {
-                        ColorAnimation { duration: 150 }
-                    }
-                    Behavior on border.color {
-                        ColorAnimation { duration: 150 }
-                    }
-                    Behavior on border.width {
-                        NumberAnimation { duration: 150 }
-                    }
+                    border.color: "#45475a"
+                    border.width: 2
 
                     ColumnLayout {
                         anchors.centerIn: parent
@@ -143,12 +135,8 @@ Rectangle {
                             // Icon background
                             Rectangle {
                                 anchors.fill: parent
-                                color: sessionMouseArea.containsMouse ? "#585b70" : "#45475a"
+                                color: "#45475a"
                                 radius: 10
-
-                                Behavior on color {
-                                    ColorAnimation { duration: 150 }
-                                }
                             }
 
                             // Nerd Font Icon
@@ -190,7 +178,7 @@ Rectangle {
                     MouseArea {
                         id: sessionMouseArea
                         anchors.fill: parent
-                        hoverEnabled: true
+                        hoverEnabled: false
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
                             autoSelectTimer.stop()

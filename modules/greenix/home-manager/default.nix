@@ -384,6 +384,9 @@ in
         monthBeforeDay = true;
         name = "Portland, United States";
       };
+      dock = {
+        enabled = false;
+      };
       controlCenter = {
       	cards = [
           {
