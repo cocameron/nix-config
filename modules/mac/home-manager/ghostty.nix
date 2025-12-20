@@ -50,5 +50,8 @@ in
     # macOS specific
     macos-option-as-alt = true
     macos-titlebar-style = tabs
+    macos-icon = custom-style
+    macos-icon-ghost-color = ${theme.colors.fg}
+    macos-icon-screen-color = ${theme.colors.bg0}
   '';
 }

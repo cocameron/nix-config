@@ -29,10 +29,7 @@ in
   };
 
   environment.systemPackages = with pkgs; [
-    discord
-    raycast
     pinentry_mac
-    zed-editor
   ];
 
   home-manager = {
@@ -74,17 +71,18 @@ in
       "1password"
       "ghostty"
       "steam"
-      #   "ubiquiti-unifi-controller"
-      #   "logitune"
-      #   "zoom"
+      "discord"
+      "ubiquiti-unifi-controller"
+      "logitune"
+      "zoom"
       #   "netspot"
-      #   "tailscale"
-      #   "orbstack"
-      #   "rectangle-pro"
-      #   "hiddenbar"
-      #   "windows-app"
-      #   "vlc"
-      #   "firefox"
+      "tailscale"
+      "orbstack"
+      "rectangle-pro"
+      "hiddenbar"
+      "windows-app"
+      "vlc"
+      "firefox"
       #   "raycast"
       #   "pinentry-mac"
     ];

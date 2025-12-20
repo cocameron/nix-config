@@ -9,10 +9,6 @@
     plasma-manager.inputs.nixpkgs.follows = "nixpkgs";
     plasma-manager.inputs.home-manager.follows = "home-manager";
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
-    dgop = {
-      url = "github:AvengeMedia/dgop";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.0.0";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -29,11 +25,6 @@
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # mac-app-util = {
-    #  url = "github:hraban/mac-app-util";
-    #  inputs.nixpkgs.url = "github:NixOS/nixpkgs?rev=a84b0a7c509bdbaafbe6fe6e947bdaa98acafb99";
-    #};
-
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
 
     # Optional: Declarative tap management
