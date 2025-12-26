@@ -83,6 +83,7 @@ in
       "windows-app"
       "vlc"
       "firefox"
+      "moonlight"
       #   "raycast"
       #   "pinentry-mac"
     ];
