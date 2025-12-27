@@ -75,7 +75,6 @@ in
       "ubiquiti-unifi-controller"
       "logitune"
       "zoom"
-      #   "netspot"
       "tailscale"
       "orbstack"
       "rectangle-pro"
@@ -84,8 +83,6 @@ in
       "vlc"
       "firefox"
       "moonlight"
-      #   "raycast"
-      #   "pinentry-mac"
     ];
   };
 

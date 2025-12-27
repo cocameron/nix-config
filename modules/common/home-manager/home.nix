@@ -38,6 +38,9 @@ in
           nvd
           nh
           claude-code
+	  neovim
+	  fd
+	  cargo
         ]
         ++ config.local.machinePackages;
       sessionVariables = {
@@ -45,21 +48,13 @@ in
       };
     };
 
+    xdg.configFile."nvim" = {
+      source = ./nvim;
+      recursive = true;
+    };
+
     programs = {
       home-manager.enable = true;
-      neovim = {
-        enable = true;
-        plugins = with pkgs.vimPlugins; [
-          everforest
-        ];
-        extraLuaConfig = ''
-          -- Everforest Dark theme configuration
-          vim.opt.background = "dark"
-          vim.g.everforest_background = "medium"
-          vim.g.everforest_better_performance = 1
-          vim.cmd([[colorscheme everforest]])
-        '';
-      };
       git = {
         enable = true;
         lfs.enable = true;
