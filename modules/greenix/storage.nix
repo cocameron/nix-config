@@ -26,4 +26,18 @@
 
   # User group for NFS access
   users.groups.rust-users = { };
+
+  # Windows partition mount
+  # fileSystems."/mnt/windows" = {
+  #   device = "/dev/disk/by-uuid/01DC5CDC6C71F380";
+  #   fsType = "ntfs3";
+  #   options = [
+  #     "rw"
+  #     "uid=1000"
+  #     "gid=100"
+  #     "dmask=022"
+  #     "fmask=133"
+  #     "nofail"
+  #   ];
+  # };
 }

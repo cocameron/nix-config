@@ -8,7 +8,7 @@
   config = {
     # Bootloader.
     boot.loader.systemd-boot.enable = lib.mkForce false;
-    boot.loader.systemd-boot.configurationLimit = 2;
+    boot.loader.systemd-boot.configurationLimit = 5;
     boot.lanzaboote = {
       enable = true;
       pkiBundle = "/var/lib/sbctl";
@@ -83,7 +83,6 @@
       "kvm-amd"
       "tcp_bbr"
     ];
-    boot.extraModulePackages = [ ];
 
     # Use LTS kernel for smaller initrd (temporary workaround for small boot partition)
     # TODO: Resize boot partition to 512MB+ and switch back to linuxPackages_latest

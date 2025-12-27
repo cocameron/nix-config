@@ -19,6 +19,7 @@ in
     # Greenix specific modules
     ./modules/greenix/boot.nix
     ./modules/greenix/desktop.nix
+    ./modules/greenix/flatpak.nix
     ./modules/greenix/gaming.nix
     ./modules/greenix/hardware.nix
     ./modules/greenix/jovian.nix
