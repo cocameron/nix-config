@@ -36,22 +36,27 @@ in
     user = constants.primaryUser;
   };
 
-  services.lidarr = {
-    enable = true;
-    user = constants.primaryUser;
-    settings = {
-      update = {
-        mechanism = "builtIn";
-      };
-    };
-  };
-
   services.prowlarr = {
     enable = true;
   };
 
+  services.overseerr = {
+    enable = true;
+    port = 5055;
+  };
+
+  # Music Assistant
+  services.music-assistant = {
+    enable = true;
+    providers = [ "plex" "sonos" ];
+  };
+
   # Unpackerr and iSponsorBlockTV moved to home-manager (home.nix)
 
-  # Allow Plex on LAN interface only (not exposed to internet)
-  networking.firewall.interfaces."ens18".allowedTCPPorts = [ 32400 ];
+  # Allow Plex and Music Assistant on LAN interface only (not exposed to internet)
+  networking.firewall.interfaces."ens18".allowedTCPPorts = [
+    32400  # Plex
+    8095   # Music Assistant web interface
+    8097   # Music Assistant stream server
+  ];
 }

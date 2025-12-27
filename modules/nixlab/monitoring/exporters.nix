@@ -63,6 +63,5 @@ in
     exportarr-radarr = mkArrExporter "radarr" 9191 "http://localhost:7878";
     exportarr-sonarr = mkArrExporter "sonarr" 9192 "http://localhost:8989";
     exportarr-prowlarr = mkArrExporter "prowlarr" 9193 "http://localhost:9696";
-    exportarr-lidarr = mkArrExporter "lidarr" 9194 "http://localhost:8686";
   };
 }

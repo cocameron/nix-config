@@ -16,12 +16,15 @@ in
     inputs.sops-nix.nixosModules.default
     ./modules/common/base.nix
     ./modules/common/nixos-base.nix
+    ./modules/nixlab/reverse-proxy-services.nix
     ./modules/nixlab/monitoring
     ./modules/nixlab/services/media.nix
     ./modules/nixlab/services/networking.nix
     ./modules/nixlab/services/home-assistant.nix
-    ./modules/nixlab/services/glance.nix
+    ./modules/nixlab/services/glance/glance.nix
     ./modules/nixlab/services/romm.nix
+    ./modules/nixlab/services/qui.nix
+    ./modules/nixlab/services/udpbd-vexfat.nix
     ./modules/nixlab/storage.nix
     ./modules/nixlab/system-resources.nix
   ];
@@ -86,10 +89,6 @@ in
           mode = "0400";
         };
         prowlarr_api_key = {
-          owner = "root";
-          mode = "0400";
-        };
-        lidarr_api_key = {
           owner = "root";
           mode = "0400";
         };

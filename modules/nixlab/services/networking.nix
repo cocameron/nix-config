@@ -105,7 +105,7 @@ in
         "github.com/lucaslorentz/caddy-docker-proxy/v2@v2.10.0"
         "github.com/caddy-dns/cloudflare@v0.2.2"
       ];
-      hash = "sha256-7hWFr7GlJaY1J94ZGy732prEDLFNTpNEZHlfaVIGQSY=";
+      hash = "sha256-IOXnflJxeXCIvKGVpUthGV8EFFtqMZql0MCAF+7TIJY=";
     };
   };
 

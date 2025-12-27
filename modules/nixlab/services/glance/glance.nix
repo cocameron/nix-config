@@ -1,6 +1,6 @@
 { lib, pkgs, config, ... }:
 let
-  constants = import ../../common/constants.nix;
+  constants = import ../../../common/constants.nix;
   reverseProxyServicesMap = config.nixlab.reverseProxyServices;
 
   qbittorrent-stats = import ./qbittorrent-stats.nix;
@@ -13,10 +13,10 @@ let
     grafana = "si:grafana";
     plex = "si:plex";
     qbittorrent = "si:qbittorrent";
+    qui = "si:qbittorrent";
     radarr = "si:radarr";
     sonarr = "si:sonarr";
     prowlarr = "si:prowlarr";
-    lidarr = "si:lidarr";
     profilarr = "si:sonarr";
     proxmox = "si:proxmox";
   };

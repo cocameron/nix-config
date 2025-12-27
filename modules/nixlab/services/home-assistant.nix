@@ -20,22 +20,28 @@
       "simplisafe"
       "spotify"
       "apple_tv"
+      "androidtv_remote"
       "google_translate"
       "cast"
       "hue"
       "sonos"
       "plex"
+      "music_assistant"
       "homekit_controller"
       "ecobee"
       "isal"
       "zha"
+      "zwave_js"
       "hassio"
       "homekit"
       "wemo"
+      "wiz"
     ];
 
     config = {
       default_config = { };
+      automation = "!include automations.yaml";
+      scene = "!include scenes.yaml";
       http = {
         use_x_forwarded_for = true;
         trusted_proxies = [
@@ -55,6 +61,22 @@
       };
     };
   };
+
+  # Z-Wave JS UI
+  services.zwave-js-ui = {
+    enable = true;
+    serialPort = "/dev/serial/by-id/usb-Nabu_Casa_ZWA-2_80B54EE6BA98-if00";
+    settings = {
+      PORT = "8092";
+    };
+  };
+
+  # Fix firmware update fetching by providing DNS and SSL certificates to the chroot
+  systemd.services.zwave-js-ui.serviceConfig.BindReadOnlyPaths = [
+    "/etc/resolv.conf"
+    "/etc/ssl/certs"
+    "/etc/static/ssl/certs"
+  ];
 
   # Firewall configuration for HomeKit bridge
   networking.firewall = {

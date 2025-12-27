@@ -41,7 +41,6 @@ let
         {"__address__" = "127.0.0.1:9191", "job" = "radarr", "instance" = "nixlab"},
         {"__address__" = "127.0.0.1:9192", "job" = "sonarr", "instance" = "nixlab"},
         {"__address__" = "127.0.0.1:9193", "job" = "prowlarr", "instance" = "nixlab"},
-        {"__address__" = "127.0.0.1:9194", "job" = "lidarr", "instance" = "nixlab"},
       ]
       scrape_interval = "30s"
       metrics_path = "/metrics"
