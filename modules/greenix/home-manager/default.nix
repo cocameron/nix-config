@@ -356,6 +356,9 @@ in
               id = "ControlCenter";
               useDistroLogo = true;
             }
+	    {
+	      id = "SystemMonitor";
+	    }
           ];
           center = [
             {
