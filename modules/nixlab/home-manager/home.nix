@@ -24,72 +24,47 @@ in
         romm-network = {
           driver = "bridge";
         };
+        gluetun-network = {
+          driver = "bridge";
+        };
       };
       containers = {
-        # First gluetun instance for qBittorrent
-        gluetun-qbt = {
-          image = "qmcgaw/gluetun";
+        # Shared gluetun instance for both qBittorrent and Slskd (dual port forwarding)
+        gluetun = {
+          image = "gluetun:local";
           addCapabilities = [ "NET_ADMIN" ];
           devices = [ "/dev/net/tun:/dev/net/tun" ];
+          network = [ "gluetun-network" ];
           extraPodmanArgs = [ "--add-host=host.containers.internal:host-gateway" ];
           volumes = [
             "/home/${constants.primaryUser}/.config/gluetun:/config"
             "/run/secrets/wireguard_private_key:/run/secrets/wireguard_private_key:ro"
           ];
           ports = [
-            "8888:8888/tcp" # Gluetun Local Network HTTP proxy
-            "8388:8388/tcp" # Gluetun Local Network Shadowsocks
-            "8388:8388/udp" # Gluetun Local Network Shadowsocks
-            "8200:8200" # qbit web ui
+            "8888:8888/tcp" # HTTP proxy
+            "8388:8388/tcp" # Shadowsocks
+            "8388:8388/udp" # Shadowsocks
+            "8200:8200" # qBittorrent web UI
+            "5030:5030" # slskd web UI
           ];
           extraConfig = {
             Service.Slice = "media.slice";
             Service.OOMScoreAdjust = 400;
           };
           environment = {
-            WIREGUARD_MTU = 1320;
+            WIREGUARD_MTU = "1320";
             TZ = constants.timezone;
             VPN_SERVICE_PROVIDER = "protonvpn";
             VPN_TYPE = "wireguard";
             PORT_FORWARD_ONLY = "on";
             VPN_PORT_FORWARDING = "on";
-            #VPN_PORT_FORWARDING_UP_COMMAND = "/bin/sh -c '/config/assign-ports.sh qbit {{PORTS}}'";
+            VPN_PORT_FORWARDING_NUM_PORTS = "2";
+            VPN_PORT_FORWARDING_UP_COMMAND = ''"/config/assign-ports.sh {{PORTS}}"'';
             HTTPPROXY = "on";
             SHADOWSOCKS = "on";
             FIREWALL_OUTBOUND_SUBNETS = "169.254.0.0/16";
           };
-          environmentFile = [ "/home/colin/.config/gluetun/gluetun-qbt.env" ];
-        };
-
-        # Second gluetun instance for slskd
-        gluetun-slskd = {
-          image = "qmcgaw/gluetun";
-          addCapabilities = [ "NET_ADMIN" ];
-          devices = [ "/dev/net/tun:/dev/net/tun" ];
-          extraPodmanArgs = [ "--add-host=host.containers.internal:host-gateway" ];
-          volumes = [
-            "/home/${constants.primaryUser}/.config/gluetun:/config"
-            "/run/secrets/wireguard_private_key:/run/secrets/wireguard_private_key:ro"
-          ];
-          ports = [
-            "8389:8388/tcp" # Shadowsocks (different port to avoid conflict)
-            "5030:5030" # slskd web ui
-          ];
-          extraConfig = {
-            Service.Slice = "media.slice";
-            Service.OOMScoreAdjust = 400;
-          };
-          environment = {
-            WIREGUARD_MTU = 1320;
-            TZ = constants.timezone;
-            VPN_SERVICE_PROVIDER = "protonvpn";
-            VPN_TYPE = "wireguard";
-            PORT_FORWARD_ONLY = "on";
-            VPN_PORT_FORWARDING = "on";
-            VPN_PORT_FORWARDING_UP_COMMAND = "/bin/sh -c '/config/assign-ports.sh slskd {{PORTS}}'";
-            SHADOWSOCKS = "on";
-            FIREWALL_OUTBOUND_SUBNETS = "169.254.0.0/16";
-          };
+          environmentFile = [ "/home/colin/.config/gluetun/gluetun.env" ];
         };
 
         qbittorrent = {
@@ -100,12 +75,12 @@ in
             "/mnt/nfs/content:/data"
           ];
           extraConfig = {
-            Unit.Requires = "podman-gluetun-qbt.service";
-            Unit.After = "podman-gluetun-qbt.service";
+            Unit.Requires = "podman-gluetun.service";
+            Unit.After = "podman-gluetun.service";
             Service.Slice = "media.slice";
             Service.OOMScoreAdjust = 500;
           };
-          network = lib.mkForce [ "container:gluetun-qbt" ];
+          network = lib.mkForce [ "container:gluetun" ];
           environment = {
             TZ = constants.timezone;
             QBT_LEGAL_NOTICE = "confirm";
@@ -126,12 +101,12 @@ in
             "/run/secrets/slskd_pass:/run/secrets/slskd_pass:ro"
           ];
           extraConfig = {
-            Unit.Requires = "podman-gluetun-slskd.service";
-            Unit.After = "podman-gluetun-slskd.service";
+            Unit.Requires = "podman-gluetun.service";
+            Unit.After = "podman-gluetun.service";
             Service.Slice = "media.slice";
             Service.OOMScoreAdjust = 600;
           };
-          network = lib.mkForce [ "container:gluetun-slskd" ];
+          network = lib.mkForce [ "container:gluetun" ];
           environment = {
             TZ = constants.timezone;
             SLSKD_HTTP_PORT = "5030";
@@ -216,7 +191,7 @@ in
     systemd.user.services.slskd-port-monitor = {
       Unit = {
         Description = "Monitor VPN port changes and update slskd";
-        After = [ "podman-gluetun-slskd.service" ];
+        After = [ "podman-gluetun.service" ];
       };
       Service = {
         Type = "oneshot";

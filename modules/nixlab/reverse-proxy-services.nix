@@ -31,7 +31,7 @@
 
   config.nixlab.reverseProxyServices = {
     plex = { port = 32400; friendlyName = "Plex"; };
-    qbittorrent = { port = 8200; friendlyName = "qBittorrent"; };
+    qbittorrent = { port = 8200; friendlyName = "qBittorrent"; host = "127.0.0.1"; };
     qui = { port = 7476; friendlyName = "Qui"; };
     radarr = { port = 7878; friendlyName = "Radarr"; };
     prowlarr = { port = 9696; friendlyName = "Prowlarr"; };
@@ -39,12 +39,12 @@
     overseerr = { port = 5055; friendlyName = "Overseerr"; };
     ha = { port = 8123; friendlyName = "Home Assistant"; };
     music-assistant = { port = 8095; friendlyName = "Music Assistant"; };
-    slskd = { port = 5030; friendlyName = "Slskd"; };
+    slskd = { port = 5030; friendlyName = "Slskd"; host = "127.0.0.1"; };
     grafana = { port = 3000; friendlyName = "Grafana"; };
     profilarr = { port = 6868; friendlyName = "Profilarr"; };
     glance = { port = 8080; friendlyName = "Glance"; };
     wrtagweb = { port = 5031; friendlyName = "wrtagweb"; };
-    romm = { port = 8091; friendlyName = "RomM"; };
+    romm = { port = 8091; friendlyName = "RomM"; host = "127.0.0.1"; };
     zwave = { port = 8092; friendlyName = "Z-Wave JS UI"; };
     proxmox = {
       host = "192.168.1.222";

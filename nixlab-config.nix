@@ -174,7 +174,10 @@ in
     home-manager = {
       useGlobalPkgs = true;
       useUserPackages = true;
-      users.${constants.primaryUser}.imports = [ ./modules/nixlab/home-manager/home.nix ];
+      users.${constants.primaryUser}.imports = [
+        ./modules/nixlab/home-manager/home.nix
+        inputs.nixvim.homeManagerModules.nixvim
+      ];
       extraSpecialArgs = {
         machinePackages = with pkgs; [ _1password-cli ];
         nixosConfig = config;
