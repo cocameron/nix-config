@@ -8,6 +8,16 @@
 let
   constants = import ../../common/constants.nix;
   unpackerrPkg = pkgs.callPackage ../packages/unpackerr.nix { };
+  wrtag-master = pkgs.wrtag.overrideAttrs (old: rec {
+    version = "master";
+    src = pkgs.fetchFromGitHub {
+      owner = "sentriz";
+      repo = "wrtag";
+      rev = "master";
+      hash = "sha256-YzM15k2hKFM+RJElJclDCiA1bXgD69Z5T+WxvohTQzk=";
+    };
+    vendorHash = "sha256-of30nC7jnvg3yEZV9RU/qJhKclgpNhkKHbdC7JVen+I=";
+  });
 in
 {
   imports = [
@@ -15,7 +25,7 @@ in
   ];
   config = {
     home.packages = [
-      pkgs.wrtag
+      wrtag-master
       pkgs.essentia-extractor
     ];
     services.podman = {
@@ -221,7 +231,7 @@ in
       };
       Service = {
         Type = "simple";
-        ExecStart = "${pkgs.wrtag}/bin/wrtagweb";
+        ExecStart = "${wrtag-master}/bin/wrtagweb";
         Restart = "always";
         RestartSec = "10s";
         Slice = "media.slice";
