@@ -70,6 +70,7 @@ in
       users.${constants.primaryUser}.imports = [
         ./modules/greenix/home-manager/default.nix
         inputs.plasma-manager.homeModules.plasma-manager
+        inputs.nixvim.homeManagerModules.nixvim
       ];
       extraSpecialArgs = {
         machinePackages = [ ];
