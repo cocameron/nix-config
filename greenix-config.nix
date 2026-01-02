@@ -25,6 +25,7 @@ in
     ./modules/greenix/packages.nix
     ./modules/greenix/storage.nix
     ./modules/greenix/users.nix
+    ./modules/greenix/virtual-display.nix
 
     # Home Manager integration
     inputs.home-manager.nixosModules.default
@@ -55,6 +56,7 @@ in
     };
 
     services.gnome.gcr-ssh-agent.enable = true;
+    services.iperf3.enable = true;
 
     fonts.packages = with pkgs; [
       nerd-fonts.iosevka-term-slab

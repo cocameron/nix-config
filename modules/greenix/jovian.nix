@@ -54,10 +54,13 @@
         ExecStart = lib.mkForce [
           "" # Clear the original ExecStart
           (pkgs.writeShellScript "gamescope-session-4k120" ''
-            # Run gamescope-session with 4K@120Hz settings
+            # Run gamescope-session with 4K@120Hz settings on DP-1 (TV)
             export STEAM_GAMESCOPE_WIDTH=3840
             export STEAM_GAMESCOPE_HEIGHT=2160
             export STEAM_GAMESCOPE_REFRESH=120
+            # Use DP-1 (TV) for direct play. DP-1 remains active even when TV is off,
+            # allowing Sunshine to capture and stream at 1080p@60 via HDMI-A-1 virtual display
+            export GAMESCOPE_CONNECTOR=DP-1
 
             # Patch the original script to use our resolution
             ORIGINAL_SCRIPT="${pkgs.gamescope-session}/lib/steamos/gamescope-session"
