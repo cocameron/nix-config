@@ -8,7 +8,7 @@
       enable = true;
       settings = {
         background = "hard";
-        disable_italic_comment = true;
+        disable_italic_comment = 1;
       };
     };
 
@@ -140,6 +140,9 @@
 
     # Plugins
     plugins = {
+      # Web devicons
+      web-devicons.enable = true;
+
       # Detect tabstop and shiftwidth automatically
       guess-indent.enable = true;
 
@@ -225,7 +228,7 @@
       lsp = {
         enable = true;
         servers = {
-          lua-ls = {
+          lua_ls = {
             enable = true;
             settings.Lua = {
               completion.callSnippet = "Replace";

@@ -176,7 +176,7 @@ in
       useUserPackages = true;
       users.${constants.primaryUser}.imports = [
         ./modules/nixlab/home-manager/home.nix
-        inputs.nixvim.homeManagerModules.nixvim
+        inputs.nixvim.homeModules.nixvim
       ];
       extraSpecialArgs = {
         machinePackages = with pkgs; [ _1password-cli ];

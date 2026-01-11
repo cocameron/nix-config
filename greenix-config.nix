@@ -56,8 +56,6 @@ in
     };
 
     services.gnome.gcr-ssh-agent.enable = true;
-    services.iperf3.enable = true;
-
     fonts.packages = with pkgs; [
       nerd-fonts.iosevka-term-slab
       nerd-fonts.noto
@@ -70,7 +68,7 @@ in
       users.${constants.primaryUser}.imports = [
         ./modules/greenix/home-manager/default.nix
         inputs.plasma-manager.homeModules.plasma-manager
-        inputs.nixvim.homeManagerModules.nixvim
+        inputs.nixvim.homeModules.nixvim
       ];
       extraSpecialArgs = {
         machinePackages = [ ];

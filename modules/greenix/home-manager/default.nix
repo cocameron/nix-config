@@ -581,6 +581,22 @@ in
   # Enable swaybg for wallpaper management
   home.packages = with pkgs; [
     swaybg
+
+    # Script to switch to gamescope session
+    (writeShellScriptBin "switch-to-gamescope" ''
+      #!/usr/bin/env bash
+      # Switch to gamescope session and logout
+
+      # Create SDDM state directory if it doesn't exist
+      mkdir -p ~/.cache/sddm
+
+      # Tell SDDM to use gamescope session next time
+      echo '[Last]
+Session=gamescope' > ~/.cache/sddm/last-session
+
+      # Terminate current session (returns to SDDM)
+      ${systemd}/bin/loginctl terminate-session "$XDG_SESSION_ID"
+    '')
   ];
 
   gtk = {
