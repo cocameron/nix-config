@@ -14,9 +14,9 @@ let
       owner = "sentriz";
       repo = "wrtag";
       rev = "master";
-      hash = "sha256-YzM15k2hKFM+RJElJclDCiA1bXgD69Z5T+WxvohTQzk=";
+      hash = "sha256-muqdvUXqydO7wNU7FTIvradqeo04gEQfZ22k1CY8Tpw=";
     };
-    vendorHash = "sha256-of30nC7jnvg3yEZV9RU/qJhKclgpNhkKHbdC7JVen+I=";
+    vendorHash = "sha256-u2HM1J535SgB7RrDfVjKFa7QpcK06gqr5+DZaNTxcmA=";
   });
 in
 {

@@ -25,6 +25,7 @@ in
     ./modules/nixlab/services/romm.nix
     ./modules/nixlab/services/qui.nix
     ./modules/nixlab/services/udpbd-vexfat.nix
+    ./modules/nixlab/services/ups.nix
     ./modules/nixlab/storage.nix
     ./modules/nixlab/system-resources.nix
   ];
@@ -121,6 +122,10 @@ in
           mode = "0400";
         };
         igdb_client_secret = {
+          owner = "root";
+          mode = "0400";
+        };
+        upsmon_pass = {
           owner = "root";
           mode = "0400";
         };
