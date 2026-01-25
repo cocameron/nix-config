@@ -43,6 +43,14 @@ in
     networking.hostName = "greenix";
     networking.interfaces.enp11s0.wakeOnLan.enable = true;
 
+    # Increase network buffers for better UDP performance
+    boot.kernel.sysctl = {
+      "net.core.wmem_max" = 16777216;      # 16 MB
+      "net.core.wmem_default" = 1048576;   # 1 MB
+      "net.core.rmem_max" = 16777216;      # 16 MB
+      "net.core.rmem_default" = 1048576;   # 1 MB
+    };
+
     # Secrets management
     sops = {
       defaultSopsFile = "/var/lib/sops-nix/secrets.yaml";

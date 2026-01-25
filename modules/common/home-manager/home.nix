@@ -40,6 +40,7 @@ in
           claude-code
 	  fd
 	  cargo
+    tealdeer
         ]
         ++ config.local.machinePackages;
       sessionVariables = {

@@ -15,6 +15,7 @@ in
       {
         home-manager.sharedModules = [
           # inputs.mac-app-util.homeManagerModules.default
+          inputs.nixvim.homeManagerModules.nixvim
         ];
       }
     )
@@ -78,7 +79,6 @@ in
       "tailscale"
       "orbstack"
       "rectangle-pro"
-      "hiddenbar"
       "windows-app"
       "vlc"
       "firefox"
