@@ -70,6 +70,7 @@ in
             VPN_PORT_FORWARDING = "on";
             VPN_PORT_FORWARDING_NUM_PORTS = "2";
             VPN_PORT_FORWARDING_UP_COMMAND = ''"/config/assign-ports.sh {{PORTS}}"'';
+#SERVER_COUNTRIES="Netherlands";
             HTTPPROXY = "on";
             SHADOWSOCKS = "on";
             FIREWALL_OUTBOUND_SUBNETS = "169.254.0.0/16";
@@ -83,6 +84,7 @@ in
           volumes = [
             "/home/${constants.primaryUser}/.config/qbittorrent:/config"
             "/mnt/nfs/content:/data"
+            "/var/lib/qbittorrent/incomplete:/incomplete"
           ];
           extraConfig = {
             Unit.Requires = "podman-gluetun.service";
@@ -194,6 +196,24 @@ in
           environmentFile = [ nixosConfig.sops.templates."romm-env".path ];
         };
 
+        pulsarr = {
+          image = "lakker/pulsarr:latest";
+          extraPodmanArgs = [ "--add-host=host.containers.internal:host-gateway" ];
+          ports = [
+            "3003:3003"
+          ];
+          volumes = [
+            "/home/${constants.primaryUser}/.config/pulsarr:/app/data"
+          ];
+          extraConfig = {
+            Service.Slice = "media.slice";
+            Service.OOMScoreAdjust = 700;
+          };
+          environment = {
+            TZ = constants.timezone;
+          };
+        };
+
       };
     };
 
@@ -286,6 +306,12 @@ in
         WantedBy = [ "default.target" ];
       };
     };
+
+    # Create qBittorrent incomplete directory for fast local downloads
+    home.activation.createQbittorrentIncomplete = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      $DRY_RUN_CMD mkdir -p /var/lib/qbittorrent/incomplete
+      $DRY_RUN_CMD chmod 755 /var/lib/qbittorrent/incomplete
+    '';
 
     home.stateVersion = "24.11";
   };

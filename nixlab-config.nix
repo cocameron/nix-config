@@ -26,6 +26,10 @@ in
     ./modules/nixlab/services/qui.nix
     ./modules/nixlab/services/udpbd-vexfat.nix
     ./modules/nixlab/services/ups.nix
+    ./modules/nixlab/services/audiobookshelf.nix
+    ./modules/nixlab/services/pulsarr.nix
+    ./modules/nixlab/services/komga.nix
+    ./modules/nixlab/services/suwayomi-server.nix
     ./modules/nixlab/storage.nix
     ./modules/nixlab/system-resources.nix
   ];

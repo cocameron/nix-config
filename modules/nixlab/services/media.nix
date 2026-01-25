@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   constants = import ../../common/constants.nix;
@@ -22,27 +22,25 @@ in
     {
       enable = true;
       package = plexpass;
-      user = constants.primaryUser;
     };
 
   # Arr Services
   services.radarr = {
     enable = true;
-    user = constants.primaryUser;
   };
 
   services.sonarr = {
     enable = true;
-    user = constants.primaryUser;
   };
+
+  # Grant NFS access to media services
+  # NFS export uses all_squash to map all client UIDs to rust-users (UID/GID 1000)
+  users.users.plex.extraGroups = [ "rust-users" ];
+  users.users.radarr.extraGroups = [ "rust-users" ];
+  users.users.sonarr.extraGroups = [ "rust-users" ];
 
   services.prowlarr = {
     enable = true;
-  };
-
-  services.overseerr = {
-    enable = true;
-    port = 5055;
   };
 
   # Music Assistant

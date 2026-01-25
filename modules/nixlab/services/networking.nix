@@ -49,15 +49,30 @@ let
           ''
         else
           "";
+
+      # Special handling for audiobookshelf: rewrite paths to add /audiobookshelf prefix
+      # Recent versions have /audiobookshelf hardcoded in pre-built binaries
+      # Only rewrite paths that don't already start with /audiobookshelf
+      rewriteConfig =
+        if name == "audiobookshelf" then
+          ''
+            @notAudiobookshelf not path /audiobookshelf/*
+            rewrite @notAudiobookshelf /audiobookshelf{uri}
+            reverse_proxy ${upstream} {
+              ${transportConfig}
+            }
+          ''
+        else
+          ''
+            reverse_proxy ${upstream} {
+              ${transportConfig}
+            }
+          '';
     in
     {
       name = "${name}.${constants.domain.nixlab}";
       value = {
-        extraConfig = ''
-          reverse_proxy ${upstream} {
-            ${transportConfig}
-          }
-        '';
+        extraConfig = rewriteConfig;
       };
     };
 in

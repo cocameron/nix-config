@@ -32,5 +32,8 @@
   };
 
   # User group for NFS access
-  users.groups.rust-users = { };
+  # GID must match the rust-users group on OpenMediaVault NFS server (GID 1000)
+  users.groups.rust-users = {
+    gid = 1000;
+  };
 }

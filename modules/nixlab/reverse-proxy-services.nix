@@ -36,7 +36,6 @@
     radarr = { port = 7878; friendlyName = "Radarr"; };
     prowlarr = { port = 9696; friendlyName = "Prowlarr"; };
     sonarr = { port = 8989; friendlyName = "Sonarr"; };
-    overseerr = { port = 5055; friendlyName = "Overseerr"; };
     ha = { port = 8123; friendlyName = "Home Assistant"; };
     music-assistant = { port = 8095; friendlyName = "Music Assistant"; };
     slskd = { port = 5030; friendlyName = "Slskd"; host = "127.0.0.1"; };
@@ -46,6 +45,10 @@
     wrtagweb = { port = 5031; friendlyName = "wrtagweb"; };
     romm = { port = 8091; friendlyName = "RomM"; host = "127.0.0.1"; };
     zwave = { port = 8092; friendlyName = "Z-Wave JS UI"; };
+    audiobookshelf = { port = 13378; friendlyName = "Audiobookshelf"; host = "127.0.0.1"; };
+    pulsarr = { port = 3003; friendlyName = "Pulsarr"; host = "127.0.0.1"; };
+    komga = { port = 25600; friendlyName = "Komga"; host = "127.0.0.1"; };
+    suwayomi = { port = 4567; friendlyName = "Suwayomi"; host = "127.0.0.1"; };
     proxmox = {
       host = "192.168.1.222";
       port = 8006;
